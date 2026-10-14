@@ -1,0 +1,1631 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Prototipo académico TC2003B: data link Sell-In / Sell-Out para L’Oréal México con datos sintéticos.">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Data Link L’Oréal México</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: banda de usuarios arriba (quién eres), franja de sesión (qué ves) y el tablero de ese usuario debajo. */
+:root {
+  --plane: #f2f2ee; --surface: #fcfcfb; --raised: #ffffff;
+  --ink: #0b0b0b; --ink-2: #52514e; --muted: #75736d; --grid: #e4e3dc; --axis: #c3c2b7; --line: rgba(11, 11, 11, .10);
+  --so: #2a78d6; --si: #eb6834; --crit-bar: #d03b3b;
+  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
+  --good-ink: #0a6a0a; --warning-ink: #7a5000; --critical-ink: #a32222; --neutral-ink: #52514e;
+  --good-wash: rgba(12, 163, 12, .10); --warning-wash: rgba(250, 178, 25, .18); --critical-wash: rgba(208, 59, 59, .10); --neutral-wash: rgba(11, 11, 11, .06);
+  --sel: #10203a; --sel-ink: #f6f7fb; --sel-soft: #e7ebf3;
+  --div-neg: #e34948; --div-pos: #2a78d6; --div-mid: #efeee9;
+  --camp: rgba(42, 120, 214, .11); --base: rgba(11, 11, 11, .05);
+  --land: #e9e8e2; --land-edge: #cfcdc4;
+  --shadow: 0 1px 2px rgba(11, 11, 11, .05);
+  --hero-bg: #0f1b30; --hero-deep: #0a1322; --hero-ink: #f4f6fa; --hero-muted: rgba(244, 246, 250, .72); --hero-line: rgba(255, 255, 255, .14);
+  --e1: #1c5cab; --e2: #3987e5; --e3: #86b6ef; --e1-ink: #ffffff; --e2-ink: #0b1a30; --e3-ink: #0b1a30;
+  --font-ui: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --plane: #0e0e0d; --surface: #1a1a19; --raised: #20201e;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9a988f; --grid: #2c2c2a; --axis: #45443f; --line: rgba(255, 255, 255, .10);
+    --so: #3987e5; --si: #d95926; --crit-bar: #e05252;
+    --good-ink: #4fd34f; --warning-ink: #fab219; --critical-ink: #f28383; --neutral-ink: #c3c2b7;
+    --good-wash: rgba(12, 163, 12, .16); --warning-wash: rgba(250, 178, 25, .16); --critical-wash: rgba(208, 59, 59, .20); --neutral-wash: rgba(255, 255, 255, .07);
+    --sel: #dfe6f5; --sel-ink: #0e1626; --sel-soft: #1f2636;
+    --div-neg: #e66767; --div-pos: #3987e5; --div-mid: #33332f;
+    --camp: rgba(57, 135, 229, .16); --base: rgba(255, 255, 255, .06);
+    --land: #262624; --land-edge: #3a3a36;
+    --hero-bg: #111d33; --hero-deep: #0a1322;
+    --e1: #86b6ef; --e2: #3987e5; --e3: #256abf; --e1-ink: #0b1a30; --e2-ink: #0b1a30; --e3-ink: #ffffff;
+    --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --plane: #0e0e0d; --surface: #1a1a19; --raised: #20201e;
+  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9a988f; --grid: #2c2c2a; --axis: #45443f; --line: rgba(255, 255, 255, .10);
+  --so: #3987e5; --si: #d95926; --crit-bar: #e05252;
+  --good-ink: #4fd34f; --warning-ink: #fab219; --critical-ink: #f28383; --neutral-ink: #c3c2b7;
+  --good-wash: rgba(12, 163, 12, .16); --warning-wash: rgba(250, 178, 25, .16); --critical-wash: rgba(208, 59, 59, .20); --neutral-wash: rgba(255, 255, 255, .07);
+  --sel: #dfe6f5; --sel-ink: #0e1626; --sel-soft: #1f2636;
+  --div-neg: #e66767; --div-pos: #3987e5; --div-mid: #33332f;
+  --camp: rgba(57, 135, 229, .16); --base: rgba(255, 255, 255, .06);
+  --land: #262624; --land-edge: #3a3a36;
+  --hero-bg: #111d33; --hero-deep: #0a1322;
+  --e1: #86b6ef; --e2: #3987e5; --e3: #256abf; --e1-ink: #0b1a30; --e2-ink: #0b1a30; --e3-ink: #ffffff;
+  --shadow: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--plane); }
+body { color: var(--ink); font: 15px/1.5 var(--font-ui); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+b { font-weight: 600; }
+small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 0; }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+.ic { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* franja de prototipo + encabezado de la propuesta (azul marino en ambos temas) */
+.ribbon { background: var(--hero-deep); color: var(--hero-muted); font-size: 12.5px; border-bottom: 1px solid var(--hero-line); }
+.ribbon .wrap { display: flex; flex-wrap: wrap; gap: 4px 16px; justify-content: space-between; align-items: center; padding-block: 7px; }
+.ribbon b { color: var(--hero-ink); }
+.rb-link { appearance: none; background: none; border: 0; padding: 0; color: var(--hero-ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.rb-link:focus-visible { outline: 2px solid var(--hero-ink); outline-offset: 2px; border-radius: 3px; }
+.hero { background: var(--hero-bg); color: var(--hero-ink); }
+.hero-in { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 22px 40px; padding-block: 30px 32px; }
+.hero-l { min-width: 0; flex: 1 1 420px; }
+.hero-k { margin: 0 0 6px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--hero-muted); font-weight: 600; }
+.hero-t { margin: 0; font-size: clamp(42px, 6.6vw, 76px); line-height: .98; letter-spacing: -.03em; font-weight: 700; }
+.hero-s { margin: 14px 0 0; font-size: 15px; line-height: 1.5; color: var(--hero-muted); max-width: 56ch; }
+.hero-f { display: grid; grid-template-columns: repeat(3, auto); margin: 0; }
+.hero-f div { padding: 2px 22px; border-left: 1px solid var(--hero-line); min-width: 0; }
+.hero-f dt { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--hero-muted); font-weight: 600; white-space: nowrap; }
+.hero-f dd { margin: 6px 0 0; font-size: 28px; font-weight: 600; letter-spacing: -.015em; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hero-f dd span { display: block; margin-top: 5px; font-size: 12.5px; font-weight: 400; letter-spacing: 0; color: var(--hero-muted); }
+.app-top { padding-top: 20px; }
+
+/* filtros globales */
+.filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; margin-top: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.fl-h { display: inline-flex; gap: 6px; align-items: center; align-self: center; font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-right: 2px; }
+.fl { display: grid; gap: 3px; min-width: 0; }
+.fl-l { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.fl select { appearance: none; -webkit-appearance: none; font: inherit; font-size: 13.5px; color: var(--ink); background: var(--raised) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%2375736d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center / 12px; border: 1px solid var(--axis); border-radius: 8px; padding: 6px 28px 6px 10px; max-width: 100%; cursor: pointer; }
+.fl select:focus-visible { outline: 2px solid var(--so); outline-offset: 1px; }
+.fl.locked b { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; background: var(--warning-wash); border: 1px solid transparent; }
+.fl.locked .ic { color: var(--warning-ink); }
+.fl-note { margin: 0 0 0 auto; align-self: center; display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.filters > .fl-note:only-child { margin-left: 0; color: var(--ink-2); }
+.btn.sm { padding: 6px 10px; font-size: 12.5px; }
+
+/* usuarios */
+.users-l { margin: 4px 0 8px; font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.users-l span { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.users { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.user { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 10px 10px 10px; display: flex; gap: 10px; align-items: center; text-align: left; cursor: pointer; font: inherit; min-width: 0; position: relative; transition: background .15s, border-color .15s, transform .15s; }
+.user:hover { border-color: var(--axis); }
+.user:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
+.user[aria-selected="true"] { background: var(--sel); color: var(--sel-ink); border-color: var(--sel); }
+.av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--sel-soft); color: var(--ink); flex: none; letter-spacing: .02em; }
+.user[aria-selected="true"] .av { background: var(--sel-ink); color: var(--sel); }
+.u-txt { display: flex; flex-direction: column; min-width: 0; }
+.u-txt b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.u-txt span { font-size: 12.5px; opacity: .78; line-height: 1.3; }
+.u-n { position: absolute; top: 6px; right: 8px; font-size: 11px; font-family: var(--font-mono); opacity: .5; }
+
+/* sesión */
+.session { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; gap: 14px 28px; align-items: center; box-shadow: var(--shadow); }
+.who { display: flex; gap: 12px; align-items: center; }
+.av.big { width: 46px; height: 46px; font-size: 16px; background: var(--sel); color: var(--sel-ink); }
+.who p { margin: 0; }
+.who-l { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.who-n { font-size: 18px; font-weight: 700; }
+.who-r { font-size: 13px; color: var(--ink-2); }
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 20px; margin: 0; }
+.facts div { min-width: 0; border-left: 1px solid var(--line); padding-left: 14px; }
+.facts dt { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.facts dd { margin: 2px 0 0; font-size: 14px; font-weight: 500; display: flex; gap: 6px; align-items: center; }
+.facts dd.lock { color: var(--warning-ink); }
+
+/* pantalla */
+#screen { padding-block: 22px 40px; }
+#screen.enter { animation: enter .35s ease-out; }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { #screen.enter { animation: none; } .toast.show { animation: none !important; } }
+.screen-head { display: grid; gap: 12px; margin-bottom: 18px; }
+.eyebrow { margin: 0; font-size: 12.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.screen-head h1 { margin: 0; font-size: clamp(24px, 3.1vw, 34px); line-height: 1.15; letter-spacing: -.015em; font-weight: 700; text-wrap: balance; max-width: 30ch; }
+.finding { display: flex; gap: 14px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; max-width: 980px; box-shadow: var(--shadow); }
+.finding-l { flex: none; font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--sel-ink); background: var(--sel); padding: 3px 8px; border-radius: 6px; }
+.finding p { margin: 0; font-size: 16px; line-height: 1.5; }
+.rls { display: flex; gap: 10px; align-items: flex-start; background: var(--warning-wash); color: var(--ink); border-radius: 10px; padding: 10px 14px; font-size: 14px; max-width: 980px; }
+.rls .ic { margin-top: 3px; color: var(--warning-ink); }
+.rls.soft { background: var(--neutral-wash); }
+.rls.soft .ic { color: var(--ink-2); }
+.fresh { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 12.5px; }
+.fresh-l { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-weight: 600; margin-right: 4px; }
+.fr { display: inline-flex; gap: 5px; align-items: center; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); }
+.fr.ok .ic { color: var(--good-ink); }
+.fr.late { background: var(--critical-wash); border-color: transparent; color: var(--critical-ink); font-weight: 600; }
+
+/* chips de estado */
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 7px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.chip .ic { width: 13px; height: 13px; }
+.s-good.chip { background: var(--good-wash); color: var(--good-ink); }
+.s-warning.chip { background: var(--warning-wash); color: var(--warning-ink); }
+.s-critical.chip { background: var(--critical-wash); color: var(--critical-ink); }
+.s-neutral.chip { background: var(--neutral-wash); color: var(--neutral-ink); }
+
+/* tiles */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.tile { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; box-shadow: var(--shadow); }
+.tile header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tile h3 { margin: 0; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.info { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--axis); color: var(--muted); display: grid; place-items: center; font-size: 11px; font-weight: 700; cursor: help; font-style: italic; font-family: Georgia, serif; flex: none; }
+.info:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
+.val { font-size: 32px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+.sub { font-size: 13px; color: var(--ink-2); }
+.tile footer { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 4px; min-height: 22px; }
+.delta { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.delta span { font-weight: 400; color: var(--muted); }
+.delta.up { color: var(--good-ink); } .delta.down { color: var(--critical-ink); }
+.spark { margin-left: auto; opacity: .9; }
+
+/* tarjetas */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; min-width: 0; box-shadow: var(--shadow); }
+.card-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 12px; margin-bottom: 10px; }
+.card-h > div { min-width: 0; flex: 1 1 260px; }
+.src { display: inline-flex; gap: 5px; align-items: center; max-width: 100%; padding: 2px 7px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; line-height: 1.5; cursor: default; }
+.src > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.src .ic { width: 12px; height: 12px; }
+.empty { margin: 0; padding: 26px 12px; text-align: center; color: var(--muted); font-size: 14px; }
+/* cobertura por etapa */
+.cov-bar { display: flex; gap: 2px; height: 36px; border-radius: 8px; overflow: hidden; margin: 6px 0 14px; }
+.seg-c { display: grid; place-items: center; min-width: 0; font-size: 12.5px; font-weight: 600; cursor: help; }
+.seg-c.st1 { background: var(--e1); color: var(--e1-ink); } .seg-c.st2 { background: var(--e2); color: var(--e2-ink); } .seg-c.st3 { background: var(--e3); color: var(--e3-ink); }
+.sw.cst1 { background: var(--e1); } .sw.cst2 { background: var(--e2); } .sw.cst3 { background: var(--e3); }
+.cov-leg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 20px; }
+.cov-i { display: flex; gap: 9px; align-items: flex-start; font-size: 13px; min-width: 0; }
+.cov-i .sw { margin-top: 4px; }
+.cov-i b { font-size: 14px; }
+.cov-i > div > b { display: block; }
+.cov-i span { display: block; color: var(--ink-2); }
+.cov-i .mono-n { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.card-h h2 { margin: 0; font-size: 16.5px; font-weight: 600; letter-spacing: -.005em; }
+.card-h p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.grid-2.wide-l { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.grid-2 > .card { margin-bottom: 0; }
+.grid-2 { margin-bottom: 12px; }
+.note { margin: 8px 0 0; font-size: 13px; color: var(--ink-2); }
+.chart { width: 100%; min-height: 120px; }
+.chart svg { display: block; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin-bottom: 6px; }
+.legend span { display: inline-flex; gap: 7px; align-items: center; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.sw.line { height: 3px; border-radius: 2px; width: 16px; }
+.sw.dot { border-radius: 50%; width: 10px; height: 10px; }
+.sw.s-so { background: var(--so); } .sw.s-si { background: var(--si); }
+.sw.b-camp { background: var(--camp); border: 1px solid var(--so); }
+.sw.b-base { background: var(--base); border: 1px solid var(--axis); }
+.sw.pt-Normal, .sw.st-0 { background: var(--muted); }
+.sw.pt-Exceso { background: var(--warning); } .sw.pt-Riesgo, .sw.st-2 { background: var(--critical); }
+.sw.st-1 { background: var(--warning); }
+
+/* SVG */
+svg text { font-family: var(--font-ui); }
+.grid { stroke: var(--grid); stroke-width: 1; }
+.base { stroke: var(--axis); stroke-width: 1; }
+.ref { stroke: var(--axis); stroke-width: 1.2; }
+.tick { fill: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.tick.lab { fill: var(--ink); font-size: 12.5px; }
+.axis-t { fill: var(--ink-2); font-size: 12px; }
+.band-l { fill: var(--ink-2); font-size: 12px; font-weight: 600; }
+.end-l { fill: var(--ink-2); font-size: 12px; }
+.end-v { fill: var(--ink); font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ln-thin { fill: none; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.ln.s-so, .ln-thin.s-so { stroke: var(--so); } .ln.s-si, .ln-thin.s-si { stroke: var(--si); }
+.dot { stroke: var(--surface); stroke-width: 2; }
+.dot.s-so { fill: var(--so); } .dot.s-si { fill: var(--si); }
+.bar.s-so { fill: var(--so); } .bar.s-si { fill: var(--si); } .bar.s-crit { fill: var(--crit-bar); }
+.xhair { stroke: var(--axis); stroke-width: 1; }
+.hit { fill: transparent; cursor: crosshair; }
+.band-hl { fill: transparent; cursor: crosshair; }
+.band-hl.on { fill: var(--neutral-wash); }
+.b-camp { fill: var(--camp); } .b-base { fill: var(--base); }
+.zone-crit { fill: var(--critical-wash); } .zone-warn { fill: var(--warning-wash); }
+.pt { stroke: var(--surface); stroke-width: 2; cursor: pointer; }
+.pt-Normal { fill: var(--muted); fill-opacity: .7; } .pt-Exceso { fill: var(--warning); } .pt-Riesgo { fill: var(--critical); }
+.pt-l { fill: var(--ink); font-size: 12.5px; font-weight: 600; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.row-hit { fill: transparent; }
+.hrow:hover .row-hit { fill: var(--neutral-wash); }
+.land { fill: var(--land); stroke: var(--land-edge); stroke-width: 1; }
+.st { stroke: var(--surface); stroke-width: 1.5; cursor: pointer; }
+.cb { stroke: var(--surface); stroke-width: 1.5; cursor: pointer; }
+.cb-good { fill: var(--muted); fill-opacity: .5; } .cb-warning { fill: var(--warning); fill-opacity: .9; } .cb-critical { fill: var(--critical); fill-opacity: .9; }
+.cb:hover { stroke: var(--ink); }
+.sw.cst-good { background: var(--muted); opacity: .7; } .sw.cst-warning { background: var(--warning); } .sw.cst-critical { background: var(--critical); }
+.city-l { fill: var(--ink); font-size: 12.5px; font-weight: 600; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; }
+
+/* tablas */
+.tbl-wrap { overflow-x: auto; margin: 0 -4px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.tbl th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 8px 8px; border-bottom: 1px solid var(--axis); white-space: nowrap; }
+.tbl td { padding: 9px 8px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl tr.hl td { background: var(--neutral-wash); }
+.tbl tfoot td { border-top: 1px solid var(--axis); border-bottom: 0; font-weight: 600; padding-top: 10px; }
+.tbl tfoot td[colspan] { font-weight: 500; color: var(--ink-2); }
+.tbl td .chip { white-space: normal; }
+.muted-s { display: block; font-size: 12px; color: var(--muted); }
+.tbl.heat td.hm { text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; border: 2px solid var(--surface); border-radius: 6px; cursor: help; }
+.div-legend { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-2); margin-top: 10px; flex-wrap: wrap; }
+.div-legend i { width: 120px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--div-neg), var(--div-mid), var(--div-pos)); }
+
+/* alertas */
+.alerts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.alert { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 3px; background: var(--raised); }
+.alert.a-critical { border-left: 3px solid var(--critical); border-radius: 0 10px 10px 0; }
+.alert.a-warning { border-left: 3px solid var(--warning); border-radius: 0 10px 10px 0; }
+.alert-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; align-items: center; }
+.to { display: inline-flex; gap: 5px; align-items: center; font-size: 12px; color: var(--muted); }
+.alert p { margin: 0; }
+.alert-t { font-weight: 600; font-size: 14px; }
+.alert-m { font-size: 13px; color: var(--ink-2); }
+.link-btn { justify-self: start; appearance: none; background: none; border: 0; padding: 4px 0 0; color: var(--so); font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+.link-btn:hover { text-decoration: underline; }
+.link-btn:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; border-radius: 4px; }
+
+/* promociones */
+.seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 1000px; }
+.seg button { appearance: none; text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 9px 12px; font: inherit; cursor: pointer; display: grid; }
+.seg button span { font-size: 12.5px; color: var(--ink-2); }
+.seg button[aria-selected="true"] { border-color: var(--so); box-shadow: inset 0 0 0 1px var(--so); background: var(--camp); }
+.seg button:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
+.talk { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.talk li { display: grid; gap: 4px; justify-items: start; border-bottom: 1px solid var(--grid); padding-bottom: 10px; }
+.talk li:last-child { border-bottom: 0; padding-bottom: 0; }
+.talk p { margin: 0; font-size: 14px; }
+.finding p .chip { margin-right: 6px; vertical-align: 1px; }
+.verdict { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid var(--line); background: var(--surface); }
+.verdict .chip { font-size: 14px; padding: 4px 12px 4px 9px; }
+.verdict p { margin: 0; font-size: 14.5px; flex: 1 1 320px; }
+
+/* salud del dato */
+.pipe { display: flex; align-items: stretch; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
+.stage { flex: 1 1 0; min-width: 150px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 2px; font-size: 13px; }
+.stage-top { display: flex; gap: 6px; align-items: center; font-size: 14px; }
+.stage.st-good .stage-top .ic { color: var(--good-ink); }
+.stage.st-warning { background: var(--warning-wash); border-color: transparent; }
+.stage.st-warning .stage-top .ic { color: var(--warning-ink); }
+.stage > span { color: var(--ink-2); }
+.stage-n { font-size: 12px; }
+.pipe-arrow { display: grid; place-items: center; color: var(--muted); flex: none; }
+.queue { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 560px; overflow-y: auto; }
+.q { display: flex; gap: 12px; justify-content: space-between; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--raised); flex-wrap: wrap; }
+.q.done { opacity: .6; }
+.q-main { min-width: 0; flex: 1 1 260px; }
+.q-chain { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--muted); margin-right: 8px; }
+.q-desc { margin: 2px 0; font-family: var(--font-mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.q-match { margin: 0; font-size: 13px; color: var(--ink-2); }
+.q-act { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn { appearance: none; border: 1px solid var(--sel); background: var(--sel); color: var(--sel-ink); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--axis); }
+.btn:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
+
+/* tooltip y aviso */
+.tip { position: fixed; z-index: 50; pointer-events: none; background: var(--raised); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; box-shadow: 0 6px 24px rgba(0, 0, 0, .16); max-width: 300px; }
+.tt-h { font-weight: 600; margin-bottom: 4px; }
+.tt-r { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+.tt-r span { color: var(--ink-2); flex: 1; }
+.tt-r b { font-variant-numeric: tabular-nums; }
+.tt-r .sw { width: 10px; height: 10px; }
+.tt-p { margin: 0; line-height: 1.45; }
+.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--sel); color: var(--sel-ink); padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 28px rgba(0, 0, 0, .22); max-width: calc(100% - 32px); }
+.toast.show { animation: toast .3s ease-out; }
+@keyframes toast { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+footer.foot { border-top: 1px solid var(--line); color: var(--ink-2); font-size: 12.5px; }
+footer.foot .wrap { padding-block: 16px 28px; }
+.foot-row { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; }
+.assume { margin-bottom: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.assume summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--ink); }
+.assume summary:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; border-radius: 4px; }
+.assume ul { margin: 10px 0 2px; padding-left: 18px; display: grid; gap: 6px; max-width: 920px; font-size: 13.5px; color: var(--ink); }
+kbd { font-family: var(--font-mono); font-size: 11.5px; border: 1px solid var(--axis); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+
+@media (max-width: 1080px) {
+  .users { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .seg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-f { grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .hero-f div:first-child { border-left: 0; padding-left: 0; }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-2, .grid-2.wide-l { grid-template-columns: minmax(0, 1fr); }
+  .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .session { grid-template-columns: minmax(0, 1fr); }
+  .users { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .val { font-size: 27px; }
+  .hero-in { padding-block: 22px 24px; }
+  .hero-f { grid-template-columns: minmax(0, 1fr); }
+  .hero-f div { border-left: 0; padding: 10px 0 0; border-top: 1px solid var(--hero-line); }
+  .hero-f div:first-child { padding-top: 10px; }
+  .hero-f dd { font-size: 24px; white-space: normal; }
+  .cov-leg { grid-template-columns: minmax(0, 1fr); }
+  .fl { flex: 1 1 calc(50% - 12px); }
+  .fl select { width: 100%; }
+  .fl-note { margin-left: 0; }
+  .spark { display: none; }
+  .finding { flex-direction: column; gap: 8px; }
+}
+@media (max-width: 460px) {
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .u-txt span { display: none; }
+  .seg { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+
+
+<div class="ribbon"><div class="wrap"><span><b>Prototipo académico TC2003B</b> · Datos sintéticos a escala de una venta anual de €1,000 M; no son cifras reales de L’Oréal México ni de las cadenas.</span><button type="button" class="rb-link" data-assume>Ver supuestos</button></div></div>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <div class="hero-l">
+      <p class="hero-k">Propuesta para</p>
+      <h1 class="hero-t">L’Oréal México</h1>
+      <p class="hero-s">Data link Sell-In / Sell-Out sobre Microsoft Fabric y Power BI: un solo modelo, seis tableros, uno por cada área. Equipo TC2003B · Tec de Monterrey.</p>
+    </div>
+    <dl class="hero-f" id="hero-facts"></dl>
+  </div>
+</header>
+
+<div class="wrap app-top">
+  <p class="users-l">Elige un usuario <span>Cada perfil ve su propio tablero y solo los datos que le corresponden</span></p>
+  <nav class="users" id="users" role="tablist" aria-label="Cambiar de usuario"></nav>
+  <section class="session" id="session" aria-live="polite"></section>
+  <div class="filters" id="filters" aria-label="Filtros globales"></div>
+  <main id="screen"></main>
+</div>
+
+<footer class="foot"><div class="wrap">
+  <details class="assume" id="supuestos"><summary>Supuestos del prototipo</summary><ul id="assume"></ul></details>
+  <div class="foot-row">
+    <span>Seis tableros sobre un solo modelo semántico: las mismas definiciones de indicadores para todos los usuarios.</span>
+    <span>Teclas <kbd>1</kbd>–<kbd>6</kbd> cambian de usuario</span>
+  </div>
+</div></footer>
+
+<div class="tip" id="tip" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* Modelo de datos sintéticos a escala de L'Oréal México + modelo semántico (todas las medidas se calculan aquí). */
+const MODEL = (() => {
+  // ---------- utilidades ----------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rand = mulberry32(2026);
+  const noise = (amp) => 1 + (rand() * 2 - 1) * amp;
+  const sum = (a) => a.reduce((s, x) => s + x, 0);
+  const avg = (a) => (a.length ? sum(a) / a.length : 0);
+  const range = (a, b) => { const r = []; for (let i = a; i <= b; i++) r.push(i); return r; };
+  const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const addDays = (d, n) => new Date(d.getTime() + n * 864e5);
+  const fmtDate = (d) => `${d.getUTCDate()} ${MESES[d.getUTCMonth()]}`;
+  const fmtDateY = (d) => `${fmtDate(d)} ${d.getUTCFullYear()}`;
+
+  // ---------- supuestos de escala (se muestran en la página) ----------
+  const ASSUME = {
+    annualEUR: 1000e6, eurMxn: 20, netOfPvp: 0.55, growth: 0.09,
+    // mezcla de venta neta de L'Oréal México por canal y etapa del data link (supuesto del equipo)
+    channels: [
+      { name: 'Autoservicio · 5 cadenas conectadas', share: 0.281, stage: 1 },
+      { name: 'Comercio electrónico · Mercado Libre y Amazon', share: 0.084, stage: 1 },
+      { name: 'Resto del autoservicio y del comercio electrónico', share: 0.065, stage: 2 },
+      { name: 'Farmacias', share: 0.15, stage: 3 },
+      { name: 'Departamentales y especialistas', share: 0.24, stage: 3 },
+      { name: 'Salones y canal indirecto', share: 0.18, stage: 3 },
+    ],
+  };
+  ASSUME.annualMXN = ASSUME.annualEUR * ASSUME.eurMxn;
+  ASSUME.connected = sum(ASSUME.channels.filter((c) => c.stage === 1).map((c) => c.share));
+  const WEEKLY_MXN = (ASSUME.annualMXN * ASSUME.connected) / 52; // Sell-In neto semanal de las 7 cadenas
+
+  // ---------- calendario: 52 semanas comerciales S42 2025 – S41 2026 ----------
+  const NW = 52, LAST = NW - 1;
+  const WEEKS = range(0, LAST).map((i) => {
+    const y = i <= 10 ? 2025 : 2026, n = i <= 10 ? 42 + i : i - 10;
+    const w1 = y === 2025 ? new Date(Date.UTC(2024, 11, 30)) : new Date(Date.UTC(2025, 11, 29));
+    const start = addDays(w1, (n - 1) * 7), end = addDays(start, 6);
+    return { i, n, y, label: 'S' + n, full: `S${n} ${y}`, start, end, range: `${fmtDate(start)} – ${fmtDateY(end)}` };
+  });
+  const lastWeeks = (k) => range(NW - k, LAST);
+  const prevWeeks = (k) => (NW - 2 * k >= 0 ? range(NW - 2 * k, NW - k - 1) : null);
+  const W4 = lastWeeks(4), W8 = lastWeeks(8);
+  const CUT = new Date(Date.UTC(2026, 9, 13));
+
+  // ---------- cadenas (Etapa 1) ----------
+  const CHAINS = [
+    { id: 'walmart', name: 'Walmart de México', short: 'Walmart', type: 'Autoservicio', share: 0.42, freq: 'Diaria', daily: true, lastCut: new Date(Date.UTC(2026, 9, 13)), cover: 3.5, every: 2, phase: 1, prefix: 'WM', stores: 1280, pStart: 0.019 },
+    { id: 'soriana', name: 'Soriana', short: 'Soriana', type: 'Autoservicio', share: 0.14, freq: 'Semanal', daily: false, lastCut: new Date(Date.UTC(2026, 9, 11)), cover: 3.5, every: 1, phase: 0, prefix: 'SO', stores: 610, pStart: 0.022 },
+    { id: 'chedraui', name: 'Chedraui', short: 'Chedraui', type: 'Autoservicio', share: 0.11, freq: 'Semanal', daily: false, lastCut: new Date(Date.UTC(2026, 9, 11)), cover: 3.5, every: 1, phase: 0, prefix: 'CH', stores: 420, pStart: 0.02 },
+    { id: 'heb', name: 'HEB', short: 'HEB', type: 'Autoservicio', share: 0.06, freq: 'Diaria', daily: true, lastCut: new Date(Date.UTC(2026, 9, 13)), cover: 3.5, every: 1, phase: 0, prefix: 'HB', stores: 82, pStart: 0.015 },
+    { id: 'lacomer', name: 'La Comer', short: 'La Comer', type: 'Autoservicio', share: 0.04, freq: 'Diaria', daily: true, lastCut: new Date(Date.UTC(2026, 9, 9)), cover: 3.5, every: 1, phase: 0, prefix: 'LC', stores: 76, pStart: 0.017 },
+    { id: 'mercadolibre', name: 'Mercado Libre', short: 'Mercado Libre', type: 'Comercio electrónico', share: 0.13, freq: 'Diaria', daily: true, lastCut: new Date(Date.UTC(2026, 9, 13)), cover: 2, every: 1, phase: 0, prefix: 'MLM', stores: 0 },
+    { id: 'amazon', name: 'Amazon México', short: 'Amazon', type: 'Comercio electrónico', share: 0.1, freq: 'Diaria', daily: true, lastCut: new Date(Date.UTC(2026, 9, 13)), cover: 2, every: 1, phase: 0, prefix: 'AMZ', stores: 0 },
+  ];
+  const chainById = Object.fromEntries(CHAINS.map((c) => [c.id, c]));
+  CHAINS.forEach((c) => {
+    const expected = c.daily ? CUT : new Date(Date.UTC(2026, 9, 11));
+    c.delayDays = Math.round((expected - c.lastCut) / 864e5);
+    c.lastCutLabel = fmtDate(c.lastCut);
+  });
+
+  // ---------- portafolio: 20 SKUs prioritarios + resto del portafolio por marca y categoría ----------
+  const P = (id, brand, name, cat, div, pvp, share, pack) => ({ id, brand, name, cat, div, pvp, share, pack, top: true });
+  const R = (brand, cat, div, pvp, share, skus) => ({ id: `rest-${brand}-${cat}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'), brand, name: `Resto del portafolio · ${cat}`, cat, div, pvp, share, pack: 1, top: false, skus });
+  const PRODUCTS = [
+    P('lp-elvive-ole', "L'Oréal Paris", 'Elvive Óleo Extraordinario Shampoo 680 ml', 'Cabello', 'GC', 139, 0.03, 12),
+    P('lp-elvive-hh', "L'Oréal Paris", 'Elvive Hidra Hialurónico Shampoo 370 ml', 'Cabello', 'GC', 99, 0.022, 12),
+    P('lp-revi-serum', "L'Oréal Paris", 'Revitalift Sérum Ácido Hialurónico 30 ml', 'Cuidado de la piel', 'GC', 449, 0.028, 12),
+    P('lp-revi-crema', "L'Oréal Paris", 'Revitalift Crema de Día FPS 30 50 ml', 'Cuidado de la piel', 'GC', 329, 0.018, 12),
+    P('lp-excellence', "L'Oréal Paris", 'Excellence Creme Tinte 5.0', 'Coloración', 'GC', 169, 0.016, 12),
+    P('lp-infallible', "L'Oréal Paris", 'Infallible 32H Base 30 ml', 'Maquillaje', 'GC', 329, 0.014, 24),
+    P('gr-fructis', 'Garnier', 'Fructis Shampoo Liso 650 ml', 'Cabello', 'GC', 89, 0.024, 12),
+    P('gr-micelar', 'Garnier', 'Skin Active Agua Micelar 400 ml', 'Cuidado de la piel', 'GC', 159, 0.018, 12),
+    P('gr-nutrisse', 'Garnier', 'Nutrisse Tinte 6.0', 'Coloración', 'GC', 109, 0.014, 12),
+    P('gr-aclara', 'Garnier', 'Express Aclara Sérum Vitamina C 30 ml', 'Cuidado de la piel', 'GC', 219, 0.012, 12),
+    P('gr-ambre', 'Garnier', 'Ambre Solaire FPS 50 200 ml', 'Protección solar', 'GC', 249, 0.012, 12),
+    P('mb-lash', 'Maybelline', 'Lash Sensational Máscara', 'Maquillaje', 'GC', 239, 0.022, 24),
+    P('mb-fitme', 'Maybelline', 'Fit Me Base Mate 30 ml', 'Maquillaje', 'GC', 259, 0.016, 24),
+    P('mb-superstay', 'Maybelline', 'SuperStay Matte Ink Labial', 'Maquillaje', 'GC', 249, 0.012, 24),
+    P('nyx-butter', 'NYX', 'Butter Gloss', 'Maquillaje', 'GC', 179, 0.008, 24),
+    P('cv-crema', 'CeraVe', 'Crema Hidratante 454 g', 'Cuidado de la piel', 'BD', 489, 0.03, 6),
+    P('cv-limp', 'CeraVe', 'Limpiador Espumoso 473 ml', 'Cuidado de la piel', 'BD', 429, 0.022, 6),
+    P('lrp-anth', 'La Roche-Posay', 'Anthelios UVMune 400 FPS 50+ 50 ml', 'Protección solar', 'BD', 629, 0.02, 6),
+    P('lrp-eff', 'La Roche-Posay', 'Effaclar Gel Limpiador 200 ml', 'Cuidado de la piel', 'BD', 459, 0.012, 6),
+    P('vi-m89', 'Vichy', 'Minéral 89 Sérum 50 ml', 'Cuidado de la piel', 'BD', 749, 0.008, 6),
+    R("L'Oréal Paris", 'Cabello', 'GC', 129, 0.07, 160), R("L'Oréal Paris", 'Cuidado de la piel', 'GC', 299, 0.05, 140),
+    R("L'Oréal Paris", 'Coloración', 'GC', 159, 0.04, 120), R("L'Oréal Paris", 'Maquillaje', 'GC', 249, 0.03, 260),
+    R('Garnier', 'Cabello', 'GC', 95, 0.05, 110), R('Garnier', 'Cuidado de la piel', 'GC', 169, 0.04, 90),
+    R('Garnier', 'Coloración', 'GC', 109, 0.035, 80), R('Garnier', 'Protección solar', 'GC', 229, 0.015, 30),
+    R('Maybelline', 'Maquillaje', 'GC', 219, 0.11, 420), R('NYX', 'Maquillaje', 'GC', 189, 0.04, 380),
+    R('CeraVe', 'Cuidado de la piel', 'BD', 399, 0.07, 45), R('La Roche-Posay', 'Cuidado de la piel', 'BD', 489, 0.035, 70),
+    R('La Roche-Posay', 'Protección solar', 'BD', 559, 0.025, 25), R('Vichy', 'Cuidado de la piel', 'BD', 629, 0.032, 60),
+  ];
+  const TOP = PRODUCTS.filter((p) => p.top);
+  const CATS = ['Cuidado de la piel', 'Cabello', 'Maquillaje', 'Coloración', 'Protección solar'];
+  const DIVS = { GC: 'Gran Consumo', BD: 'Belleza Dermatológica' };
+  const BRANDS = [...new Set(PRODUCTS.map((p) => p.brand))];
+  const prodById = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
+  PRODUCTS.forEach((p, k) => {
+    p.net = p.pvp * ASSUME.netOfPvp;
+    p.full = `${p.brand} ${p.name}`;
+    if (!p.top) return;
+    p.sap = 'MAT-' + String(410200 + k * 37 + Math.floor(rand() * 30)).padStart(6, '0');
+    const g = '750' + String(Math.floor(rand() * 1e9)).padStart(9, '0');
+    let s = 0; for (let i = 0; i < 12; i++) s += Number(g[i]) * (i % 2 ? 3 : 1);
+    p.gtin = g + ((10 - (s % 10)) % 10);
+    p.codes = {};
+    const d = (n) => String(Math.floor(rand() * 10 ** n)).padStart(n, '0');
+    CHAINS.forEach((c) => {
+      p.codes[c.id] = c.id === 'walmart' ? 'WM' + d(7) : c.id === 'soriana' ? d(6) : c.id === 'chedraui' ? 'CH-' + d(5)
+        : c.id === 'heb' ? d(8) : c.id === 'lacomer' ? 'LC' + d(6) : c.id === 'mercadolibre' ? 'MLM' + d(10)
+        : 'B0' + Math.floor(rand() * 36 ** 8).toString(36).toUpperCase().padStart(8, 'X');
+    });
+  });
+  const AFF = {
+    walmart: { BD: 0.8, GC: 1.05 }, soriana: { BD: 0.75, GC: 1.06 }, chedraui: { BD: 0.75, GC: 1.06 },
+    heb: { BD: 1.1, GC: 0.97 }, lacomer: { BD: 1.3, GC: 0.92 }, mercadolibre: { BD: 1.5, GC: 0.86 }, amazon: { BD: 1.55, GC: 0.85 },
+  };
+
+  function season(p, c, i) {
+    const { n, y } = WEEKS[i];
+    let f = Math.pow(1 + ASSUME.growth, i / 52);
+    if (y === 2025 && n === 46) f *= c.id === 'walmart' ? 1.45 : 1.22;          // Buen Fin 2025
+    if (y === 2025 && n === 47) f *= c.id === 'walmart' ? 1.12 : 1.04;
+    if (y === 2025 && n === 48 && c.id === 'walmart') f *= 1.08;
+    if (y === 2025 && (n === 50 || n === 51)) f *= p.cat === 'Maquillaje' ? 1.35 : 1.14; // Navidad
+    if (y === 2025 && n === 52) f *= 0.95;
+    if (y === 2026 && n <= 4) f *= 0.9;                                             // cuesta de enero
+    if (p.cat === 'Protección solar') f *= y === 2026 && n >= 10 && n <= 30 ? 1.45 : y === 2026 && n >= 31 && n <= 35 ? 1.0 : 0.72;
+    if (p.cat === 'Maquillaje' && y === 2026 && n === 18 && c.id === 'walmart') f *= 1.18; // Día de las Madres
+    if (p.cat === 'Maquillaje' && y === 2026 && n === 19) f *= c.id === 'walmart' ? 1.32 : 1.06;
+    return f;
+  }
+  const isWalmartCeraVe = (c, p) => c.id === 'walmart' && p.top && p.brand === 'CeraVe';
+  const isAmazonMaybelline = (c, p) => c.id === 'amazon' && p.top && p.brand === 'Maybelline';
+  function scenarioSO(c, p, i) {
+    const { n, y } = WEEKS[i];
+    if (c.id === 'mercadolibre' && y === 2026 && (n === 22 || n === 23)) return 1.38; // Hot Sale
+    if (c.id === 'mercadolibre' && y === 2026 && (n === 24 || n === 25)) return 1.15;
+    if (c.id === 'amazon' && y === 2026 && (n === 28 || n === 29)) return 1.06;      // Venta de verano
+    if (isWalmartCeraVe(c, p) && i >= 44) return 0.96;
+    if (c.id === 'mercadolibre' && p.id === 'lp-revi-serum' && i >= 48) return [1.25, 1.55, 1.85, 2.1][i - 48];
+    return 1;
+  }
+
+  // ---------- hechos semanales: cadena × producto × semana (piezas) ----------
+  const FACTS = {};
+  CHAINS.forEach((c) => {
+    FACTS[c.id] = {};
+    const wsum = sum(PRODUCTS.map((p) => p.share * AFF[c.id][p.div]));
+    PRODUCTS.forEach((p) => {
+      const valueWeek = WEEKLY_MXN * c.share * ((p.share * AFF[c.id][p.div]) / wsum);
+      const meanF = avg(range(0, LAST).map((i) => season(p, c, i) * scenarioSO(c, p, i)));
+      const base = valueWeek / p.net / meanF;
+      const so = range(0, LAST).map((i) => Math.max(0, Math.round(base * season(p, c, i) * noise(p.top ? 0.06 : 0.03) * scenarioSO(c, p, i))));
+      const si = [], open = [], close = [];
+      let inv = Math.round(c.cover * so[0] * noise(0.06));
+      for (let i = 0; i <= LAST; i++) {
+        open[i] = inv;
+        let q = 0;
+        if ((i + c.phase) % c.every === 0) {
+          let expected = i === 0 ? so[0] : avg(so.slice(Math.max(0, i - 3), i));
+          if (c.id === 'mercadolibre' && i >= 32 && i <= 35) expected = so[i];
+          if (c.id === 'walmart' && i === 3) expected = so[4];       // abasto para Buen Fin
+          q = Math.max(0, Math.ceil(((c.cover + c.every) * expected - inv) / p.pack) * p.pack);
+          if (c.type === 'Autoservicio' && c.every === 1) q = Math.max(0, Math.round((q * noise(0.25)) / p.pack) * p.pack);
+        }
+        const X = (a, b) => avg(so.slice(a, b + 1));
+        if (isWalmartCeraVe(c, p) && i >= 44) q = Math.round(([0, 3.4, 0, 2.9, 0, 3.2, 0, 2.6][i - 44] * X(40, 43)) / p.pack) * p.pack;
+        if (c.id === 'amazon' && (i === 38 || i === 39)) q = Math.round((2.8 * X(34, 37)) / p.pack) * p.pack;
+        if (c.id === 'amazon' && (i === 40 || i === 41)) q = 0;
+        if (isAmazonMaybelline(c, p) && i >= 48) q = Math.round(([4, 3, 3, 1][i - 48] * X(44, 47)) / p.pack) * p.pack; // compra anticipada Buen Fin 2026
+        if (c.id === 'mercadolibre' && p.id === 'lp-revi-serum' && i >= 49) q = Math.round((q * 0.5) / p.pack) * p.pack;
+        si[i] = q;
+        inv = Math.max(0, inv + q - so[i]);
+        close[i] = inv;
+      }
+      let rep;
+      if (c.id === 'heb') rep = Math.round(close[LAST] / 1.18);
+      else { let e = (rand() * 2 - 1) * 0.03; if (Math.abs(e) < 0.006) e = 0.006 * Math.sign(e || 1); rep = Math.round(close[LAST] * (1 + e)); }
+      FACTS[c.id][p.id] = { so, si, open, close, reported: rep };
+    });
+  });
+
+  // ---------- tiendas ----------
+  const CITY = {
+    'CDMX': [19.43, -99.13], 'Guadalajara': [20.67, -103.35], 'Monterrey': [25.69, -100.32], 'Puebla': [19.04, -98.21], 'Querétaro': [20.59, -100.39],
+    'León': [21.12, -101.68], 'Toluca': [19.29, -99.66], 'Tijuana': [32.51, -117.04], 'Mexicali': [32.62, -115.45], 'Cd. Juárez': [31.69, -106.42],
+    'Chihuahua': [28.63, -106.07], 'Hermosillo': [29.07, -110.96], 'Culiacán': [24.8, -107.39], 'Mazatlán': [23.25, -106.41], 'Torreón': [25.54, -103.41],
+    'Saltillo': [25.42, -101.0], 'San Luis Potosí': [22.16, -100.98], 'Aguascalientes': [21.88, -102.29], 'Morelia': [19.7, -101.19], 'Cuernavaca': [18.92, -99.22],
+    'Acapulco': [16.85, -99.88], 'Oaxaca': [17.07, -96.72], 'Veracruz': [19.17, -96.13], 'Xalapa': [19.54, -96.91], 'Villahermosa': [17.99, -92.93],
+    'Tuxtla Gutiérrez': [16.75, -93.12], 'Mérida': [20.97, -89.62], 'Cancún': [21.16, -86.85], 'Tampico': [22.23, -97.86], 'Reynosa': [26.09, -98.28],
+    'Durango': [24.02, -104.66], 'Pachuca': [20.1, -98.76], 'Campeche': [19.85, -90.53], 'La Paz': [24.14, -110.31],
+  };
+  const HOT = ['Monterrey', 'Cancún', 'Mérida', 'Hermosillo', 'Culiacán', 'Villahermosa', 'Veracruz', 'Mexicali', 'Acapulco'];
+  const FOOT = {
+    walmart: { 'CDMX': 26, 'Guadalajara': 7, 'Monterrey': 7, 'Puebla': 4, 'Toluca': 4, 'Querétaro': 3, 'León': 3, 'Tijuana': 3, 'Mexicali': 1.5, 'Cd. Juárez': 2.5, 'Chihuahua': 1.5, 'Hermosillo': 1.5, 'Culiacán': 1.5, 'Mazatlán': 1, 'Torreón': 1.5, 'Saltillo': 1.5, 'San Luis Potosí': 1.5, 'Aguascalientes': 1.2, 'Morelia': 1.5, 'Cuernavaca': 2, 'Acapulco': 1.2, 'Oaxaca': 1.2, 'Veracruz': 2, 'Xalapa': 1.2, 'Villahermosa': 1.5, 'Tuxtla Gutiérrez': 1.5, 'Mérida': 2.5, 'Cancún': 2, 'Tampico': 1.2, 'Reynosa': 1.2, 'Durango': 1, 'Pachuca': 1.5, 'Campeche': 0.8, 'La Paz': 0.8 },
+    soriana: { 'Monterrey': 18, 'Torreón': 7, 'Saltillo': 5, 'Chihuahua': 5, 'Cd. Juárez': 6, 'Reynosa': 5, 'Tampico': 4, 'San Luis Potosí': 4, 'CDMX': 12, 'Guadalajara': 7, 'Hermosillo': 3, 'Culiacán': 3, 'Mexicali': 3, 'Tijuana': 3, 'Cancún': 5, 'Mérida': 2, 'Aguascalientes': 2, 'León': 3, 'Querétaro': 3, 'Durango': 2 },
+    chedraui: { 'Veracruz': 12, 'Xalapa': 6, 'Villahermosa': 8, 'Tuxtla Gutiérrez': 6, 'Oaxaca': 5, 'Mérida': 7, 'Cancún': 8, 'Campeche': 3, 'Puebla': 8, 'CDMX': 14, 'Acapulco': 4, 'Cuernavaca': 3, 'Toluca': 3, 'Pachuca': 3, 'Querétaro': 2, 'Guadalajara': 3, 'Tampico': 2 },
+    heb: { 'Monterrey': 45, 'Saltillo': 12, 'Reynosa': 8, 'San Luis Potosí': 8, 'Querétaro': 7, 'Aguascalientes': 6, 'León': 5, 'Torreón': 5, 'Tampico': 4 },
+    lacomer: { 'CDMX': 62, 'Guadalajara': 8, 'Querétaro': 7, 'Puebla': 6, 'Cuernavaca': 6, 'Cancún': 5, 'León': 3, 'Morelia': 3 },
+  };
+  const FORMATS = { walmart: [['Walmart Supercenter', 0.23], ['Bodega Aurrera', 0.66], ['Walmart Express', 0.11]], soriana: [['Soriana Híper', 0.55], ['Soriana Súper', 0.3], ['Soriana Mercado', 0.15]], chedraui: [['Chedraui', 0.6], ['Súper Chedraui', 0.4]], heb: [['HEB', 1]], lacomer: [['La Comer', 0.5], ['Fresko', 0.25], ['City Market', 0.25]] };
+  const ZONES = ['Centro', 'Norte', 'Sur', 'Oriente', 'Poniente', 'Plaza Galerías', 'Las Américas', 'Universidad', 'Aeropuerto', 'Reforma', 'Jardines', 'Del Valle', 'Lomas', 'Industrial', 'San Pedro', 'Cumbres', 'Tecnológico', 'Libramiento', 'Juárez', 'Hidalgo'];
+  const STORES = [];
+  Object.entries(FOOT).forEach(([cid, w]) => {
+    const c = chainById[cid], tot = sum(Object.values(w));
+    const alloc = Object.entries(w).map(([city, x]) => ({ city, exact: (x / tot) * c.stores }));
+    alloc.forEach((a) => { a.n = Math.floor(a.exact); });
+    let left = c.stores - sum(alloc.map((a) => a.n));
+    [...alloc].sort((a, b) => (b.exact - b.n) - (a.exact - a.n)).slice(0, left).forEach((a) => { a.n++; });
+    let k = 0;
+    alloc.forEach(({ city, n }) => {
+      const [lat, lon] = CITY[city];
+      for (let j = 0; j < n; j++, k++) {
+        const r = rand(); let acc = 0, fmt = FORMATS[cid][0][0];
+        for (const [f, sh] of FORMATS[cid]) { acc += sh; if (r <= acc) { fmt = f; break; } }
+        const fw = fmt === 'Walmart Supercenter' || fmt.includes('Híper') ? 2.2 : fmt.includes('Express') || fmt === 'City Market' || fmt === 'Fresko' ? 0.6 : 1;
+        STORES.push({
+          id: `${cid}-${k}`, chain: cid, city, format: fmt, name: `${fmt} ${ZONES[(j + k) % ZONES.length]}${j >= ZONES.length ? ' ' + (Math.floor(j / ZONES.length) + 1) : ''}`,
+          code: `${c.prefix}-${String(1000 + k * 3)}`, lat: lat + (rand() - 0.5) * 0.3, lon: lon + (rand() - 0.5) * 0.3, weight: fw * noise(0.3),
+        });
+      }
+    });
+  });
+
+  // ---------- disponibilidad: tienda × SKU prioritario × 28 días (16 sep – 13 oct) ----------
+  const NDAYS = 28;
+  const SKU_STORE = [];
+  CHAINS.filter((c) => c.stores).forEach((c) => {
+    const st = STORES.filter((s) => s.chain === c.id), wsum = sum(st.map((s) => s.weight));
+    st.forEach((s) => {
+      const rows = TOP.map((p) => {
+        const f = FACTS[c.id][p.id];
+        let w = s.weight / wsum;
+        if (p.cat === 'Protección solar' && HOT.includes(s.city)) w *= 2;
+        const daily = (avg(W4.map((i) => f.so[i])) / 7) * w;
+        // proceso de quiebres: arranca con prob. pStart y dura 1–5 días
+        let zero = 0, active = 0, rem = 0, sold = 0;
+        let forced = 0;
+        if (c.id === 'soriana' && p.id === 'lrp-anth' && (s.city === 'Monterrey' || s.city === 'Cancún') && rand() < 0.68) forced = 4 + Math.floor(rand() * 6);
+        for (let d = 0; d < NDAYS; d++) {
+          let z;
+          if (forced && d >= NDAYS - forced) z = true;
+          else if (rem > 0) { z = true; rem--; }
+          else if (rand() < c.pStart) { z = true; rem = 0; while (rem < 4 && rand() < 0.45) rem++; }
+          else z = false;
+          if (forced && d === NDAYS - forced - 1) { rem = 0; }
+          if (z) { zero++; active++; } else { active = 0; sold += daily * noise(0.4); }
+        }
+        if (!forced && active >= 2 && rand() < 0.5) { active = 1; } // la mayoría de los quiebres de fondo se resuelven al día siguiente
+        return { store: s, prod: p, daily, zero, activeDays: active, avg28: sold / NDAYS, lost28Pesos: (sold / NDAYS) * zero * p.net };
+      });
+      const vals = rows.map((r) => r.daily * r.prod.net).sort((a, b) => a - b), med = vals[Math.floor(vals.length / 2)];
+      rows.forEach((r) => { r.highRotation = r.daily * r.prod.net >= med; r.lostPieces = r.avg28 * r.activeDays; r.lostPesos = r.lostPieces * r.prod.net; SKU_STORE.push(r); });
+    });
+  });
+
+  // ================= MODELO SEMÁNTICO =================
+  const allC = CHAINS.map((c) => c.id), allP = PRODUCTS.map((p) => p.id);
+  const sel = (chains, prods) => { const out = []; (chains || allC).forEach((c) => (prods || allP).forEach((p) => out.push({ c, p, f: FACTS[c][p] }))); return out; };
+  const M = {
+    sellThrough: (so, si) => (si > 0 ? (so / si) * 100 : null),
+    gap: (si, so) => si - so,
+    implicitInv: (open, gap) => open + gap,
+    dailyAvg: (so28) => so28 / 28,
+    doi: (inv, daily) => (daily > 0 ? inv / daily : null),
+    turnover: (so, open, close) => { const a = (open + close) / 2; return a > 0 ? so / a : null; },
+    oos: (zeroDays, totalDays) => (totalDays ? (zeroDays / totalDays) * 100 : 0),
+    coverage: (d) => (d == null ? 'Sin dato' : d < 7 ? 'Riesgo' : d > 45 ? 'Exceso' : 'Normal'),
+  };
+  function kpis(chains, prods, weeks) {
+    const rows = sel(chains, prods);
+    let si = 0, so = 0, siV = 0, soV = 0, open = 0, rep = 0, so28 = 0, closeImp = 0;
+    rows.forEach(({ p, f }) => {
+      const pr = prodById[p];
+      weeks.forEach((i) => { si += f.si[i]; so += f.so[i]; siV += f.si[i] * pr.net; soV += f.so[i] * pr.net; });
+      open += f.open[weeks[0]]; closeImp += f.close[weeks[weeks.length - 1]]; rep += f.reported;
+      W4.forEach((i) => { so28 += f.so[i]; });
+    });
+    return { si, so, siV, soV, st: M.sellThrough(so, si), gap: M.gap(si, so), gapV: siV - soV, open, implicit: M.implicitInv(open, si - so), reported: rep, doi: M.doi(rep, M.dailyAvg(so28)), turnover: M.turnover(so, open, rep) };
+  }
+  const series = (chains, prods, key, weeks, value) => {
+    const rows = sel(chains, prods);
+    return weeks.map((i) => sum(rows.map(({ p, f }) => f[key][i] * (value ? prodById[p].net : 1))));
+  };
+  function oosFor(chains, prods) {
+    const rows = SKU_STORE.filter((r) => (!chains || chains.includes(r.store.chain)) && (!prods || prods.includes(r.prod.id)));
+    return { pct: M.oos(sum(rows.map((r) => r.zero)), rows.length * NDAYS), rows };
+  }
+
+  const CASES = [];
+  CHAINS.forEach((c) => TOP.forEach((p) => {
+    const f = FACTS[c.id][p.id];
+    const so28 = sum(W4.map((i) => f.so[i]));
+    const d = M.doi(f.reported, M.dailyAvg(so28));
+    CASES.push({
+      chain: c, prod: p, doi: d, cls: M.coverage(d),
+      st8: M.sellThrough(sum(W8.map((i) => f.so[i])), sum(W8.map((i) => f.si[i]))),
+      st4: M.sellThrough(sum(W4.map((i) => f.so[i])), sum(W4.map((i) => f.si[i]))),
+      si8: sum(W8.map((i) => f.si[i])), so8: sum(W8.map((i) => f.so[i])), reported: f.reported,
+      stFor: (weeks) => M.sellThrough(sum(weeks.map((i) => f.so[i])), sum(weeks.map((i) => f.si[i]))),
+    });
+  }));
+
+  // ---------- alertas (Fabric Activator): reglas genéricas, una por caso, en orden de prioridad ----------
+  const RULES = [
+    { id: 'quiebre', name: 'Quiebre', sev: 'critical', cond: 'Inventario en cero 2+ días seguidos en un SKU de alta rotación (3% o más de las tiendas de la cadena)', to: 'KAM de la cadena', toPersonas: ['comercial'], channel: 'Teams', board: 'comercial' },
+    { id: 'dato', name: 'Dato desactualizado', sev: 'critical', cond: 'La cadena no entregó en el plazo esperado (más de 2 días)', to: 'TI y Data & Analytics', toPersonas: ['ti'], channel: 'Correo y Teams', board: 'ti' },
+    { id: 'llenado', name: 'Llenado del canal', sev: 'warning', cond: 'Sell-through menor a 40% en las últimas 4 semanas', to: 'KAM y Trade Marketing', toPersonas: ['trade'], channel: 'Teams', board: 'demand' },
+    { id: 'sobreinv', name: 'Sobreinventario', sev: 'warning', cond: 'Días de inventario mayor a 45', to: 'Supply Chain y KAM', toPersonas: ['demand', 'comercial', 'kam'], channel: 'Correo', board: 'kam' },
+    { id: 'cobertura', name: 'Cobertura baja', sev: 'warning', cond: 'Días de inventario menor a 7', to: 'Supply Chain', toPersonas: ['demand', 'comercial'], channel: 'Correo', board: 'demand' },
+  ];
+  const ruleById = Object.fromEntries(RULES.map((r) => [r.id, r]));
+  const hits = [];
+  CASES.forEach((k) => {
+    const outs = SKU_STORE.filter((r) => r.store.chain === k.chain.id && r.prod.id === k.prod.id && r.activeDays >= 2 && r.highRotation);
+    const minStores = Math.max(10, Math.ceil(0.03 * k.chain.stores));
+    let rule = null, detail = {};
+    if (k.chain.stores && outs.length >= minStores) { rule = 'quiebre'; detail = { stores: outs, maxDays: Math.max(...outs.map((o) => o.activeDays)), lost: sum(outs.map((o) => o.lostPesos)) }; }
+    else if (k.st4 != null && k.st4 < 40) rule = 'llenado';
+    else if (k.doi != null && k.doi > 45) rule = 'sobreinv';
+    else if (k.doi != null && k.doi < 7) rule = 'cobertura';
+    if (rule) hits.push({ rule, k, detail });
+  });
+  const groups = {};
+  hits.forEach((h) => { const key = `${h.rule}|${h.k.chain.id}|${h.k.prod.brand}`; (groups[key] = groups[key] || []).push(h); });
+  const ALERTS = Object.values(groups).map((g) => {
+    const r = ruleById[g[0].rule], c = g[0].k.chain, brand = g[0].k.prod.brand, prods = g.map((h) => h.k.prod);
+    const a = { rule: r, chain: c, brand, prods, cases: g.map((h) => h.k) };
+    if (r.id === 'quiebre') {
+      const d = g[0].detail, cities = [...new Set(d.stores.map((s) => s.store.city))];
+      const byCity = {}; d.stores.forEach((x) => { byCity[x.store.city] = (byCity[x.store.city] || 0) + 1; });
+      const topC = Object.entries(byCity).sort((x, y) => y[1] - x[1]);
+      a.stores = d.stores; a.cities = topC; a.lost = d.lost; a.maxDays = d.maxDays;
+      a.title = `${prods[0].brand} ${prods[0].name.replace(/ \d+ ?ml$/, '')} agotado en ${d.stores.length} tiendas de ${c.short}`;
+      a.metric = `${topC.slice(0, 2).map(([x, n]) => `${x} (${n})`).join(' y ')}${topC.length > 2 ? ` y ${topC.length - 2} ciudades más` : ''} · hasta ${d.maxDays} días sin inventario`;
+      a.score = 100;
+    } else if (r.id === 'llenado') {
+      const si = sum(g.map((h) => sum(W4.map((i) => FACTS[c.id][h.k.prod.id].si[i])))), so = sum(g.map((h) => sum(W4.map((i) => FACTS[c.id][h.k.prod.id].so[i]))));
+      a.st = M.sellThrough(so, si); a.ratio = si / so;
+      a.value = sum(g.map((h) => sum(W4.map((i) => (FACTS[c.id][h.k.prod.id].si[i] - FACTS[c.id][h.k.prod.id].so[i]) * h.k.prod.net))));
+      a.title = `${c.short} compró ${a.ratio.toFixed(1)} veces lo que vendió de ${brand}`;
+      a.metric = `Sell-through ${a.st.toFixed(0)}% en ${WEEKS[W4[0]].label}–${WEEKS[LAST].label} · ${prods.length} SKUs · posible compra anticipada de Buen Fin`;
+      a.score = 60;
+    } else if (r.id === 'sobreinv') {
+      const inv = sum(g.map((h) => h.k.reported)), so28 = sum(g.map((h) => sum(W4.map((i) => FACTS[c.id][h.k.prod.id].so[i]))));
+      a.doi = M.doi(inv, so28 / 28); a.invValue = sum(g.map((h) => h.k.reported * h.k.prod.net));
+      a.st8 = M.sellThrough(sum(g.map((h) => h.k.so8)), sum(g.map((h) => h.k.si8)));
+      a.title = `Sobreinventario de ${brand} en ${c.short}`;
+      a.metric = `${a.doi.toFixed(0)} días de inventario · sell-through ${a.st8.toFixed(0)}% en 8 semanas`;
+      a.score = 70;
+    } else {
+      a.doi = g[0].k.doi;
+      a.title = `${prods[0].brand} ${prods[0].name.split(' ')[0]} con cobertura baja en ${c.short}`;
+      a.metric = `${a.doi.toFixed(1)} días de inventario · la demanda creció en las últimas 4 semanas`;
+      a.score = 65;
+    }
+    return a;
+  });
+  CHAINS.filter((c) => c.delayDays > 2).forEach((c) => {
+    ALERTS.push({ rule: ruleById.dato, chain: c, prods: [], cases: [], title: `${c.short} no ha entregado Sell-Out desde el ${c.lastCutLabel}`, metric: `${c.delayDays} días de retraso frente a la entrega diaria esperada`, score: 90 });
+  });
+  ALERTS.sort((a, b) => b.score - a.score);
+
+  function recon(chainIds, prods, weeks) {
+    return (chainIds || allC).map((cid) => {
+      const k = kpis([cid], prods, weeks);
+      const diff = ((k.implicit - k.reported) / k.reported) * 100;
+      return { chain: chainById[cid], implicit: k.implicit, reported: k.reported, diff, flag: Math.abs(diff) > 15 };
+    });
+  }
+  function chainStatus(c, prods) {
+    const reasons = [];
+    ALERTS.filter((a) => a.chain.id === c.id && (!prods || !a.prods.length || a.prods.some((p) => prods.includes(p.id)))).forEach((a) => reasons.push({ sev: a.rule.sev, text: a.rule.name + (a.brand ? ': ' + a.brand : '') }));
+    const rc = recon([c.id], null, lastWeeks(13))[0];
+    if (rc.flag) reasons.push({ sev: 'warning', text: `Conciliación ${rc.diff > 0 ? '+' : ''}${rc.diff.toFixed(0)}% por revisar` });
+    if (c.stores) { const o = oosFor([c.id], prods).pct; if (o > 6) reasons.push({ sev: 'critical', text: `OOS ${o.toFixed(1)}%` }); else if (o >= 4.5) reasons.push({ sev: 'warning', text: `OOS ${o.toFixed(1)}%` }); }
+    const rank = { critical: 2, warning: 1 };
+    reasons.sort((a, b) => rank[b.sev] - rank[a.sev]);
+    return reasons.length ? { sev: reasons[0].sev, text: reasons[0].text, all: reasons } : { sev: 'good', text: 'Dentro de meta', all: [] };
+  }
+
+  // ---------- promociones ----------
+  const PROMOS = [
+    { id: 'hotsale', name: 'Hot Sale', chain: 'mercadolibre', cats: null, from: 32, to: 33 },
+    { id: 'verano', name: 'Venta de verano', chain: 'amazon', cats: null, from: 38, to: 39 },
+    { id: 'buenfin', name: 'Buen Fin 2025', chain: 'walmart', cats: null, from: 3, to: 4 },
+    { id: 'madres', name: 'Día de las Madres', chain: 'walmart', cats: ['Maquillaje'], from: 28, to: 29 },
+  ];
+  function promoEval(pr) {
+    const prods = PRODUCTS.filter((p) => !pr.cats || pr.cats.includes(p.cat)).map((p) => p.id);
+    const dur = pr.to - pr.from + 1;
+    const baseW = range(Math.max(0, pr.from - 4), pr.from - 1), campW = range(pr.from, pr.to), postW = range(pr.to + 1, Math.min(LAST, pr.to + 2));
+    const k = (w) => kpis([pr.chain], prods, w);
+    const b = k(baseW), cp = k(campW), po = k(postW);
+    const baseSO = (b.so / baseW.length) * dur, baseSI = (b.si / baseW.length) * dur, basePostSO = (b.so / baseW.length) * postW.length;
+    const liftSO = (cp.so / baseSO - 1) * 100, liftSI = (cp.si / baseSI - 1) * 100, postLift = (po.so / basePostSO - 1) * 100;
+    const incr = cp.so - baseSO, incrV = incr * (cp.soV / cp.so);
+    const stDur = M.sellThrough(cp.so, cp.si), stPost = M.sellThrough(po.so, po.si);
+    const sh = chainById[pr.chain].short;
+    let verdict;
+    if (liftSO >= 15 && postLift >= 5) verdict = { sev: 'good', label: 'Elevó el consumo real', why: `El Sell-Out subió ${liftSO.toFixed(0)}% frente a la base y siguió ${postLift.toFixed(0)}% arriba las dos semanas siguientes.` };
+    else if (liftSI >= 50 && liftSO < 15) verdict = { sev: 'warning', label: 'Solo llenó el canal', why: `${sh} compró ${liftSI.toFixed(0)}% más, pero el consumidor solo compró ${liftSO.toFixed(0)}% más. El resto quedó como inventario en el canal.` };
+    else if (liftSO >= 15) verdict = { sev: 'neutral', label: 'Efecto temporal', why: `El Sell-Out subió ${liftSO.toFixed(0)}% durante la campaña, pero volvió a su nivel (${postLift >= 0 ? '+' : ''}${postLift.toFixed(0)}%) las dos semanas siguientes.` };
+    else verdict = { sev: 'neutral', label: 'Sin efecto claro', why: `El Sell-Out solo cambió ${liftSO.toFixed(0)}% frente a la base.` };
+    const win = range(Math.max(0, pr.from - 6), Math.min(LAST, pr.to + 6));
+    return {
+      pr, chain: chainById[pr.chain], dur, baseW, campW, postW, liftSO, liftSI, postLift, incr, incrV, stDur, stPost, verdict, win,
+      siSeries: series([pr.chain], prods, 'si', win), soSeries: series([pr.chain], prods, 'so', win),
+      label: `${WEEKS[pr.from].full}${dur > 1 ? '–' + WEEKS[pr.to].label : ''}`,
+    };
+  }
+
+  // ---------- salud del dato ----------
+  const HEALTH = CHAINS.map((c) => ({
+    chain: c,
+    rows: { walmart: 268400, soriana: 119700, chedraui: 84200, heb: 10850, lacomer: null, mercadolibre: 21300, amazon: 15900 }[c.id],
+    vol: { walmart: 2, soriana: -4, chedraui: 1, heb: -36, lacomer: null, mercadolibre: 5, amazon: 3 }[c.id],
+    quarantine: { walmart: 0, soriana: 2, chedraui: 0, heb: 0, lacomer: 14, mercadolibre: 0, amazon: 3 }[c.id],
+    oldest: { soriana: 1, lacomer: 6, amazon: 2 }[c.id] || 0,
+    homologated: { walmart: 100, soriana: 99.6, chedraui: 100, heb: 100, lacomer: 87, mercadolibre: 100, amazon: 98.9 }[c.id],
+  }));
+  const QUAR = [
+    ['lacomer', 'LC204817', 'CERAVE CREMA HIDRAT 454G', 'Por descripción', 'cv-crema', 94],
+    ['lacomer', 'LC204818', 'CERAVE LIMP ESPUM 473ML', 'Por descripción', 'cv-limp', 91],
+    ['lacomer', 'LC311092', 'LRP ANTHELIOS UVMUNE 400 50ML', 'Por GTIN', 'lrp-anth', 100],
+    ['lacomer', 'LC118734', 'VICHY MIN89 SERUM 50', 'Por descripción', 'vi-m89', 88],
+    ['lacomer', 'LC118790', 'LOREAL REVITALIFT SER AC HIAL 30', 'Por descripción', 'lp-revi-serum', 86],
+    ['lacomer', 'LC560021', 'ELVIVE OLEO EXT SH 680', 'Por GTIN', 'lp-elvive-ole', 100],
+    ['lacomer', 'LC560022', 'FRUCTIS SH LISO 650ML', 'Por descripción', 'gr-fructis', 92],
+    ['lacomer', 'LC771240', 'MAYB LASH SENSAT MASC NEGRO', 'Por descripción', 'mb-lash', 83],
+    ['amazon', 'B0CK7Q2LZM', 'Fit Me Matte + Poreless Foundation 30ml (Tono 120)', 'Por descripción', 'mb-fitme', 79],
+    ['soriana', '771904', 'EFFACLAR GEL 200 ML LRP', 'Por descripción', 'lrp-eff', 90],
+    ['lacomer', 'LC990001', 'KIT REGALO NAVIDAD BELLEZA 3PZ', 'Sin coincidencia', null, 0],
+  ].map(([chain, code, desc, method, prod, sim], k) => ({ id: 'q' + k, chain, code, desc, method, prod, sim, status: 'pendiente' }));
+  const RULES_DQ = [
+    { id: 'C01', name: 'Sin duplicados', check: 'Misma tienda, producto y fecha en un lote', n: 1284, action: 'Se conservó el registro más reciente', sev: 'good' },
+    { id: 'C02', name: 'Producto homologado', check: 'Código de la cadena ligado a GTIN y material SAP', n: 19, action: 'En cuarentena hasta homologar', sev: 'warning' },
+    { id: 'C03', name: 'Tienda en catálogo', check: 'La tienda existe en dim_tienda', n: 4, action: 'Tiendas nuevas de Walmart Express por dar de alta', sev: 'warning' },
+    { id: 'C04', name: 'Valores válidos', check: 'Unidades negativas solo en devoluciones', n: 37, action: 'Devoluciones separadas del Sell-Out', sev: 'good' },
+    { id: 'C05', name: 'Completitud de la carga', check: 'Registros del lote dentro de ±30% del promedio', n: 1, action: 'HEB envió 36% menos registros de inventario', sev: 'critical' },
+    { id: 'C06', name: 'Cuadre del Sell-In', check: 'Unidades y monto contra el extracto de SAP', n: 0, action: 'Diferencia de 0.02%: cuadra', sev: 'good' },
+    { id: 'C07', name: 'Frescura', check: 'Fecha de corte frente a la esperada', n: 1, action: 'La Comer con 4 días de retraso', sev: 'critical' },
+  ];
+  const PIPELINE = [
+    { name: 'Aterrizaje', sub: 'ADLS Gen2 · integrador y SAP', time: '03:10', sev: 'good', note: '6 de 7 cadenas recibidas' },
+    { name: 'Bronze', sub: 'Copia cruda por lote', time: '03:25', sev: 'good', note: '520,350 registros' },
+    { name: 'Silver', sub: 'Limpio y homologado', time: '03:52', sev: 'warning', note: '19 códigos en cuarentena' },
+    { name: 'Gold', sub: 'fact_* · dim_* · conciliación', time: '04:05', sev: 'good', note: 'Modelo estrella listo' },
+    { name: 'Modelo semántico', sub: 'Power BI · Direct Lake', time: '04:20', sev: 'good', note: 'Refresco completo' },
+  ];
+
+  return {
+    ASSUME, WEEKLY_MXN, WEEKS, LAST, NW, lastWeeks, prevWeeks, W4, W8, CUT, CHAINS, chainById, PRODUCTS, TOP, prodById, CATS, DIVS, BRANDS,
+    STORES, SKU_STORE, NDAYS, CITY, FACTS, CASES, ALERTS, RULES, HEALTH, QUAR, RULES_DQ, PIPELINE, PROMOS,
+    M, kpis, series, oosFor, recon, chainStatus, promoEval, fmtDate, fmtDateY, sum, avg, range,
+  };
+})();
+if (typeof module !== 'undefined') module.exports = MODEL;
+
+</script>
+<script>
+(() => {
+  const D = MODEL;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const nf = new Intl.NumberFormat('es-MX');
+  const N = (n) => nf.format(Math.round(n));
+  const K = (n) => {
+    const a = Math.abs(n);
+    if (a >= 1e6) return (n / 1e6).toLocaleString('es-MX', { maximumFractionDigits: 1 }) + ' M';
+    if (a >= 1e4) return (n / 1e3).toLocaleString('es-MX', { maximumFractionDigits: 0 }) + ' mil';
+    if (a >= 1e3) return (n / 1e3).toLocaleString('es-MX', { maximumFractionDigits: 1 }) + ' mil';
+    return N(n);
+  };
+  const MXN = (n) => {
+    const a = Math.abs(n), s = n < 0 ? '−$' : '$';
+    if (a >= 1e9) return s + (a / 1e6).toLocaleString('es-MX', { maximumFractionDigits: 0 }) + ' M';
+    if (a >= 1e6) return s + (a / 1e6).toLocaleString('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' M';
+    if (a >= 1e5) return s + (a / 1e3).toLocaleString('es-MX', { maximumFractionDigits: 0 }) + ' mil';
+    return s + N(a);
+  };
+  const P = (x, d = 1) => (x == null ? '—' : x.toLocaleString('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }) + '%');
+  const F = (x, d = 1) => (x == null ? '—' : x.toLocaleString('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }));
+  const signed = (x, d = 0) => (x >= 0 ? '+' : '−') + Math.abs(x).toLocaleString('es-MX', { maximumFractionDigits: d, minimumFractionDigits: d });
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const wlab = (i) => D.WEEKS[i].label;
+  const pct = (a, b) => (b ? (a / b - 1) * 100 : null);
+
+  // ---------- íconos ----------
+  const ICON = {
+    lock: '<path d="M5 7V5a3 3 0 0 1 6 0v2"/><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/>',
+    alert: '<path d="M8 2.5 14 13H2z"/><path d="M8 6.5v3"/><circle cx="8" cy="11.2" r=".4"/>',
+    check: '<path d="m3.5 8.5 3 3 6-7"/>',
+    dot: '<circle cx="8" cy="8" r="3.2"/>',
+    clock: '<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>',
+    eye: '<path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
+    arrow: '<path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"/>',
+    bell: '<path d="M4 11V7a4 4 0 0 1 8 0v4l1 1.5H3z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/>',
+    db: '<ellipse cx="8" cy="4" rx="5" ry="1.8"/><path d="M3 4v8c0 1 2.2 1.8 5 1.8s5-.8 5-1.8V4"/><path d="M3 8c0 1 2.2 1.8 5 1.8S13 9 13 8"/>',
+    filter: '<path d="M2.5 3.5h11l-4.2 5v4l-2.6 1.2V8.5z"/>',
+  };
+  const icon = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 16 16" aria-hidden="true">${ICON[n]}</svg>`;
+  const SEV = {
+    good: { label: 'En meta', ic: 'check' }, warning: { label: 'Vigilar', ic: 'alert' },
+    critical: { label: 'Actuar', ic: 'alert' }, neutral: { label: 'Info', ic: 'dot' },
+  };
+  const chip = (sev, text) => `<span class="chip s-${sev}">${icon(SEV[sev].ic)}${esc(text || SEV[sev].label)}</span>`;
+  const stStatus = (st) => (st == null ? 'neutral' : st >= 95 ? 'good' : st >= 85 ? 'warning' : 'critical');
+  const doiStatus = (d) => (d == null ? 'neutral' : d < 7 || d > 45 ? 'critical' : d > 35 ? 'warning' : 'good');
+  const oosStatus = (o) => (o > 6 ? 'critical' : o >= 4.5 ? 'warning' : 'good');
+
+  // ---------- usuarios (Tabla 21 y Tabla 23 de la propuesta) ----------
+  const PERSONAS = [
+    { id: 'finanzas', name: 'Laura Méndez', initials: 'LM', role: 'Directora de Finanzas', area: 'Dirección General y Finanzas', board: 1, boardName: 'Resumen ejecutivo',
+      q: '¿Cómo vamos frente al consumo real y qué riesgos hay en el canal?', scope: 'Todas las cadenas y divisiones', rls: 'Sin filtro de fila', locked: false },
+    { id: 'kam', name: 'Diego Herrera', initials: 'DH', role: 'Key Account Manager · Walmart', area: 'Ventas', board: 2, boardName: 'Sell-In vs Sell-Out',
+      q: '¿Cuánto nos compró Walmart y cuánto vendió al consumidor?', scope: 'Solo Walmart de México', rls: 'Seguridad por fila activa', locked: true },
+    { id: 'demand', name: 'Sofía Ramírez', initials: 'SR', role: 'Demand Planner', area: 'Supply Chain y Demand Planning', board: 3, boardName: 'Inventario y cobertura',
+      q: '¿Qué clientes tienen exceso o falta de inventario?', scope: 'Todas las cadenas', rls: 'Sin filtro de fila', locked: false },
+    { id: 'comercial', name: 'Andrés Torres', initials: 'AT', role: 'Gerente de Ejecución en Tienda', area: 'Comercial y Supply Chain', board: 4, boardName: 'Disponibilidad y quiebres',
+      q: '¿Dónde hay productos agotados y cuánto se pierde?', scope: 'Las 5 cadenas con tienda física', rls: 'Sin filtro de fila', locked: false },
+    { id: 'trade', name: 'Valeria Castro', initials: 'VC', role: 'Gerente de Trade Marketing', area: 'Trade Marketing y RGM', board: 5, boardName: 'Promociones',
+      q: '¿Una promoción elevó el consumo o solo llenó el canal?', scope: 'Campañas de todas las cadenas', rls: 'Sin filtro de fila', locked: false },
+    { id: 'ti', name: 'Javier Ortiz', initials: 'JO', role: 'Ingeniero de Datos', area: 'TI y Data & Analytics', board: 6, boardName: 'Salud del dato',
+      q: '¿Qué cadenas entregaron, cuándo y con qué calidad?', scope: 'Cargas técnicas de las 7 cadenas', rls: 'Sin acceso a tableros comerciales', locked: true },
+  ];
+  const personaById = Object.fromEntries(PERSONAS.map((p) => [p.id, p]));
+  const alertsFor = (pid) => D.ALERTS.filter((a) => {
+    if (pid === 'finanzas') return true;
+    if (pid === 'kam') return a.chain.id === 'walmart' && ['quiebre', 'llenado', 'sobreinv'].includes(a.rule.id);
+    return a.rule.toPersonas.includes(pid);
+  });
+  const alertTarget = (a) => (a.rule.id === 'sobreinv' && a.chain.id !== 'walmart' ? 'demand' : a.rule.board);
+
+  // ---------- filtros globales (sección 4.1: mismos filtros en todos los tableros) ----------
+  const FIL0 = { period: 13, div: 'all', cat: 'all', chain: 'all' };
+  const FIL = { ...FIL0 };
+  const allChains = D.CHAINS.map((c) => c.id);
+  const physical = D.CHAINS.filter((c) => c.stores).map((c) => c.id);
+  const fWeeks = () => D.lastWeeks(FIL.period);
+  const fPrev = () => D.prevWeeks(FIL.period);
+  const isAllProds = () => FIL.div === 'all' && FIL.cat === 'all';
+  const inFil = (p) => (FIL.div === 'all' || p.div === FIL.div) && (FIL.cat === 'all' || p.cat === FIL.cat);
+  const fProds = (topOnly) => (isAllProds() && !topOnly ? null : D.PRODUCTS.filter((p) => (!topOnly || p.top) && inFil(p)).map((p) => p.id));
+  const fChains = (pid) => {
+    if (pid === 'kam') return ['walmart'];
+    if (pid === 'comercial') return FIL.chain !== 'all' && physical.includes(FIL.chain) ? [FIL.chain] : physical;
+    return FIL.chain === 'all' ? allChains : [FIL.chain];
+  };
+  const catsForDiv = (div) => D.CATS.filter((c) => D.PRODUCTS.some((p) => p.cat === c && (div === 'all' || p.div === div)));
+  const periodLabel = (weeks = fWeeks()) => {
+    const a = D.WEEKS[weeks[0]], b = D.WEEKS[weeks[weeks.length - 1]];
+    return a.y === b.y ? `${a.label}–${b.label} ${b.y}` : `${a.full} – ${b.full}`;
+  };
+  const prodLabel = () => [FIL.div !== 'all' ? D.DIVS[FIL.div] : '', FIL.cat !== 'all' ? FIL.cat : ''].filter(Boolean).join(' · ');
+  const chainLabel = (ch) => (ch.length === allChains.length ? 'Las 7 cadenas' : ch.length === physical.length && ch.every((c) => physical.includes(c)) ? 'Las 5 cadenas con tienda' : D.chainById[ch[0]].name);
+  const scopeLabel = (ch, weeks) => [chainLabel(ch), prodLabel(), weeks ? periodLabel(weeks) : ''].filter(Boolean).join(' · ');
+  const alertInScope = (a, ch, prods) => ch.includes(a.chain.id) && (!prods || !a.prods.length || a.prods.some((p) => prods.includes(p.id)));
+
+  // ---------- tooltip ----------
+  const tip = $('#tip');
+  function showTip(ev, html) {
+    tip.innerHTML = html; tip.hidden = false;
+    const r = tip.getBoundingClientRect();
+    let x = ev.clientX + 14, y = ev.clientY + 14;
+    if (x + r.width > window.innerWidth - 8) x = ev.clientX - r.width - 14;
+    if (y + r.height > window.innerHeight - 8) y = ev.clientY - r.height - 14;
+    tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+  const tipRows = (title, rows) => `<div class="tt-h">${esc(title)}</div>` + rows.map(([sw, k, v]) => `<div class="tt-r">${sw ? `<i class="sw ${sw}"></i>` : ''}<span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+
+  // ---------- gráficas (SVG a la medida del contenedor) ----------
+  let ro = null; const charts = new Map();
+  function resetCharts() { if (ro) ro.disconnect(); charts.clear(); ro = new ResizeObserver((es) => es.forEach((e) => { const fn = charts.get(e.target); if (fn) { const w = Math.floor(e.contentRect.width); if (w > 0 && w !== e.target._w) { e.target._w = w; fn(w); } } })); }
+  function mount(el, fn) { if (!el) return; charts.set(el, fn); ro.observe(el); const w = el.clientWidth || 640; el._w = w; fn(w); }
+  function nice(max, ticks = 4) {
+    if (max <= 0) return { step: 1, max: 1 };
+    const raw = max / ticks, mag = 10 ** Math.floor(Math.log10(raw)), n = raw / mag;
+    const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * mag;
+    return { step, max: Math.ceil(max / step) * step };
+  }
+  const axisFmt = (v) => (v >= 1e6 ? (v / 1e6).toLocaleString('es-MX') + ' M' : v >= 1e3 ? (v / 1e3).toLocaleString('es-MX') + ' mil' : String(v));
+  const axisMoney = (v) => (v === 0 ? '$0' : v >= 1e6 ? '$' + (v / 1e6).toLocaleString('es-MX', { maximumFractionDigits: 1 }) + ' M' : v >= 1e3 ? '$' + (v / 1e3).toLocaleString('es-MX') + ' mil' : '$' + v);
+  const barPath = (x, y, w, y0, r = 4) => { const rr = Math.min(r, w / 2, Math.max(0, y0 - y)); return `M${x},${y0}V${y + rr}Q${x},${y} ${x + rr},${y}H${x + w - rr}Q${x + w},${y} ${x + w},${y + rr}V${y0}Z`; };
+
+  function lineChart(el, o) {
+    mount(el, (W) => {
+      const H = o.h || 260, n = o.labels.length, tf = o.money ? axisMoney : axisFmt, ef = o.fmt || K;
+      const m = { l: o.money ? 64 : 52, r: o.endLabels ? 84 : 18, t: o.bands ? 30 : 14, b: 30 };
+      const iw = W - m.l - m.r, ih = H - m.t - m.b, stepX = iw / (n - 1);
+      const { step, max } = nice(Math.max(...o.series.flatMap((s) => s.values)) * 1.04);
+      const x = (i) => m.l + i * stepX, y = (v) => m.t + ih - (v / max) * ih;
+      let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+      (o.bands || []).forEach((b) => {
+        const x0 = Math.max(m.l, x(b.from) - stepX / 2), x1 = Math.min(W - m.r, x(b.to) + stepX / 2);
+        s += `<rect class="${b.cls}" x="${x0}" y="${m.t}" width="${x1 - x0}" height="${ih}"/><text class="band-l" x="${x0 + 6}" y="${m.t - 10}">${esc(b.label)}</text>`;
+      });
+      for (let v = 0; v <= max + 1e-9; v += step) s += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${tf(v)}</text>`;
+      const every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(iw / 48))));
+      o.labels.forEach((l, i) => { if ((n - 1 - i) % every === 0) s += `<text class="tick" x="${x(i)}" y="${H - 9}" text-anchor="middle">${l}</text>`; });
+      o.series.forEach((se) => {
+        const d = se.values.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1)).join('');
+        s += `<path class="ln ${se.cls}" d="${d}"/><circle class="dot ${se.cls}" cx="${x(n - 1)}" cy="${y(se.values[n - 1])}" r="4"/>`;
+      });
+      if (o.endLabels) {
+        const ends = o.series.map((se) => ({ se, y: y(se.values[n - 1]) }));
+        if (ends.length > 1 && Math.abs(ends[0].y - ends[1].y) < 30) {
+          const up = ends[0].y <= ends[1].y ? 0 : 1, mid = (ends[0].y + ends[1].y) / 2;
+          ends[up].y = mid - 15; ends[1 - up].y = mid + 15;
+        }
+        ends.forEach((e) => { s += `<text class="end-l" x="${x(n - 1) + 9}" y="${e.y - 2}">${esc(e.se.name)}</text><text class="end-v" x="${x(n - 1) + 9}" y="${e.y + 12}">${ef(e.se.values[n - 1])}</text>`; });
+      }
+      s += `<g class="hov" visibility="hidden"><line class="xhair" y1="${m.t}" y2="${m.t + ih}"/>${o.series.map((se) => `<circle class="dot ${se.cls}" r="4.5"/>`).join('')}</g>`;
+      s += `<rect class="hit" x="${m.l - stepX / 2}" y="${m.t}" width="${iw + stepX}" height="${ih}"/></svg>`;
+      el.innerHTML = s;
+      const svg = el.firstChild, hov = $('.hov', svg), dots = $$('.hov circle', svg), xl = $('.xhair', svg);
+      const move = (ev) => {
+        const r = svg.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - r.left - m.l) / stepX)));
+        hov.setAttribute('visibility', 'visible'); xl.setAttribute('x1', x(i)); xl.setAttribute('x2', x(i));
+        o.series.forEach((se, k) => { dots[k].setAttribute('cx', x(i)); dots[k].setAttribute('cy', y(se.values[i])); });
+        showTip(ev, o.tip(i));
+      };
+      $('.hit', svg).addEventListener('pointermove', move);
+      $('.hit', svg).addEventListener('pointerdown', move);
+      $('.hit', svg).addEventListener('pointerleave', () => { hov.setAttribute('visibility', 'hidden'); hideTip(); });
+    });
+  }
+
+  function barChart(el, o) {
+    mount(el, (W) => {
+      const H = o.h || 260, n = o.labels.length, m = { l: o.money ? 64 : 52, r: 12, t: 14, b: 30 }, tf = o.money ? axisMoney : axisFmt;
+      const iw = W - m.l - m.r, ih = H - m.t - m.b, band = iw / n;
+      const gap = Math.min(10, band * 0.3), bw = Math.max(1, Math.min(22, (band - gap) / 2 - 1));
+      const { step, max } = nice(Math.max(...o.series.flatMap((s) => s.values)) * 1.04);
+      const y = (v) => m.t + ih - (v / max) * ih, y0 = m.t + ih;
+      let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+      for (let v = 0; v <= max + 1e-9; v += step) s += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${tf(v)}</text>`;
+      const every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(iw / 48))));
+      o.labels.forEach((l, i) => {
+        const cx = m.l + band * i + band / 2;
+        s += `<rect class="band-hl" data-i="${i}" x="${m.l + band * i}" y="${m.t}" width="${band}" height="${ih}"/>`;
+        o.series.forEach((se, k) => { const bx = cx - bw - 1 + k * (bw + 2); if (se.values[i] > 0) s += `<path class="bar ${se.cls}" d="${barPath(bx, y(se.values[i]), bw, y0, bw < 6 ? 1 : 4)}"/>`; });
+        if ((n - 1 - i) % every === 0) s += `<text class="tick" x="${cx}" y="${H - 9}" text-anchor="middle">${l}</text>`;
+      });
+      s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${y0}" y2="${y0}"/></svg>`;
+      el.innerHTML = s;
+      $$('.band-hl', el).forEach((r) => {
+        const i = +r.dataset.i;
+        const on = (ev) => { $$('.band-hl', el).forEach((b) => b.classList.toggle('on', b === r)); showTip(ev, o.tip(i)); };
+        r.addEventListener('pointermove', on); r.addEventListener('pointerdown', on);
+        r.addEventListener('pointerleave', () => { r.classList.remove('on'); hideTip(); });
+      });
+    });
+  }
+
+  function scatter(el, o) {
+    mount(el, (W) => {
+      const H = o.h || 320, m = { l: 52, r: 16, t: 30, b: 40 };
+      const iw = W - m.l - m.r, ih = H - m.t - m.b;
+      const xs = nice(Math.max(50, ...o.points.map((p) => p.x)) * 1.08, 5), ys = nice(Math.max(110, ...o.points.map((p) => p.y)) * 1.06, 4);
+      const x = (v) => m.l + (v / xs.max) * iw, y = (v) => m.t + ih - (v / ys.max) * ih;
+      let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+      s += `<rect class="zone-crit" x="${m.l}" y="${m.t}" width="${x(7) - m.l}" height="${ih}"/><rect class="zone-warn" x="${x(45)}" y="${m.t}" width="${W - m.r - x(45)}" height="${ih}"/>`;
+      s += `<text class="band-l" x="${m.l}" y="${m.t - 12}">Riesgo · menos de 7 días</text><text class="band-l" x="${W - m.r}" y="${m.t - 12}" text-anchor="end">Exceso · más de 45 días</text>`;
+      for (let v = 0; v <= ys.max + 1e-9; v += ys.step) s += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${v}%</text>`;
+      for (let v = 0; v <= xs.max + 1e-9; v += xs.step) s += `<text class="tick" x="${x(v)}" y="${m.t + ih + 18}" text-anchor="middle">${v}</text>`;
+      s += `<line class="ref" x1="${m.l}" x2="${W - m.r}" y1="${y(100)}" y2="${y(100)}"/><text class="tick" x="${W - m.r - 4}" y="${y(100) - 6}" text-anchor="end">100%: vende lo que compra</text>`;
+      s += `<text class="axis-t" x="${m.l + iw / 2}" y="${H - 4}" text-anchor="middle">Días de inventario en la cadena</text>`;
+      const order = { Normal: 0, Exceso: 1, Riesgo: 2 };
+      [...o.points].sort((a, b) => order[a.cls] - order[b.cls]).forEach((p) => {
+        s += `<circle class="pt pt-${p.cls}" data-k="${o.points.indexOf(p)}" cx="${x(p.x)}" cy="${y(p.y)}" r="${p.cls === 'Normal' ? 4.5 : 6}"/>`;
+      });
+      const placed = [];
+      [...(o.labels || [])].sort((a, b) => b.y - a.y).forEach((l) => {
+        const px = x(l.x), right = px < m.l + iw * 0.7;
+        let ly = y(l.y) - 12;
+        if (placed.some((q) => Math.abs(q.y - ly) < 18 && Math.abs(q.x - px) < 170)) ly = y(l.low != null ? l.low : l.y) + 24;
+        placed.push({ x: px, y: ly });
+        s += `<text class="pt-l" x="${right ? px + 10 : px - 10}" y="${ly}" text-anchor="${right ? 'start' : 'end'}">${esc(l.text)}</text>`;
+      });
+      s += '</svg>';
+      el.innerHTML = s;
+      $$('.pt', el).forEach((c) => {
+        const p = o.points[+c.dataset.k];
+        const on = (ev) => showTip(ev, o.tip(p));
+        c.addEventListener('pointermove', on); c.addEventListener('pointerdown', on); c.addEventListener('pointerleave', hideTip);
+      });
+    });
+  }
+
+  function hbars(el, o) {
+    mount(el, (W) => {
+      const rowH = 34, vw = 150, lw = Math.min(260, Math.max(120, W * 0.42)), maxC = Math.floor((lw - 12) / 6.9);
+      const H = o.items.length * rowH + 8, bw = W - lw - vw - 8, max = Math.max(...o.items.map((i) => i.v));
+      let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+      o.items.forEach((it, k) => {
+        const yy = 4 + k * rowH, w = Math.max(3, (it.v / max) * bw);
+        s += `<g class="hrow" data-k="${k}"><rect class="row-hit" x="0" y="${yy}" width="${W}" height="${rowH}"/>`;
+        s += `<text class="tick lab" x="0" y="${yy + rowH / 2 + 4}">${esc(it.label.length > maxC ? it.label.slice(0, maxC - 1).trim() + '…' : it.label)}</text>`;
+        s += `<path class="bar ${it.cls || 's-so'}" d="M${lw},${yy + 8}H${lw + w - 4}Q${lw + w},${yy + 8} ${lw + w},${yy + 12}V${yy + rowH - 12}Q${lw + w},${yy + rowH - 8} ${lw + w - 4},${yy + rowH - 8}H${lw}Z"/>`;
+        s += `<text class="end-v" x="${lw + w + 8}" y="${yy + rowH / 2 + 4}">${esc(it.text)}</text></g>`;
+      });
+      el.innerHTML = s + '</svg>';
+      $$('.hrow', el).forEach((g) => { const it = o.items[+g.dataset.k]; const on = (ev) => showTip(ev, o.tip(it)); g.addEventListener('pointermove', on); g.addEventListener('pointerdown', on); g.addEventListener('pointerleave', hideTip); });
+    });
+  }
+
+  // Contorno simplificado de México (lon, lat)
+  const MX = [[-117.1, 32.5], [-114.7, 32.7], [-111.0, 31.3], [-108.2, 31.3], [-108.2, 31.8], [-106.5, 31.8], [-104.9, 30.6], [-104.5, 29.6], [-103.2, 28.98], [-102.4, 29.8], [-101.4, 29.8], [-100.3, 28.3], [-99.5, 27.5], [-99.1, 26.4], [-97.5, 25.9], [-97.6, 24.0], [-97.8, 22.3], [-97.2, 20.6], [-96.1, 19.2], [-95.2, 18.7], [-94.5, 18.2], [-92.6, 18.6], [-91.4, 18.6], [-90.7, 19.5], [-90.4, 20.6], [-90.3, 21.1], [-88.0, 21.6], [-86.8, 21.4], [-86.9, 20.6], [-87.5, 19.6], [-87.6, 18.5], [-88.3, 18.5], [-89.1, 17.8], [-90.9, 17.8], [-91.4, 17.3], [-90.5, 16.1], [-92.2, 15.3], [-92.2, 14.6], [-93.4, 15.6], [-94.8, 16.2], [-96.5, 15.7], [-98.5, 16.3], [-99.9, 16.8], [-101.5, 17.6], [-103.5, 18.3], [-104.7, 19.2], [-105.5, 20.4], [-105.2, 21.6], [-106.4, 23.2], [-107.9, 24.8], [-109.4, 26.3], [-110.9, 27.9], [-112.2, 29.4], [-112.9, 30.8], [-114.0, 31.6], [-114.8, 31.8], [-114.5, 30.9], [-113.5, 29.0], [-112.3, 27.5], [-111.3, 26.0], [-110.3, 24.2], [-109.4, 23.1], [-110.1, 22.9], [-111.3, 24.5], [-112.1, 26.2], [-113.9, 27.6], [-114.4, 28.1], [-114.2, 28.7], [-115.8, 30.4], [-116.7, 31.7]];
+  function mapChart(el, o) {
+    mount(el, (W) => {
+      const lon0 = -118, lon1 = -86, lat0 = 14, lat1 = 33, kx = Math.cos((23 * Math.PI) / 180);
+      const sx = W / ((lon1 - lon0) * kx), H = Math.min(440, Math.round((lat1 - lat0) * sx));
+      const sc = Math.min(sx, H / (lat1 - lat0));
+      const ox = (W - (lon1 - lon0) * kx * sc) / 2;
+      const px = (lon) => ox + (lon - lon0) * kx * sc, py = (lat) => (lat1 - lat) * sc;
+      const maxS = Math.max(...o.cities.map((c) => c.stores)), rk = Math.min(22, W / 34);
+      const rad = (c) => 3 + Math.sqrt(c.stores / maxS) * rk;
+      let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria)}">`;
+      s += `<path class="land" d="${MX.map((p, i) => (i ? 'L' : 'M') + px(p[0]).toFixed(1) + ',' + py(p[1]).toFixed(1)).join('')}Z"/>`;
+      const rank = { good: 0, warning: 1, critical: 2 };
+      [...o.cities].sort((a, b) => rank[a.sev] - rank[b.sev] || b.stores - a.stores).forEach((c, k) => {
+        s += `<circle class="cb cb-${c.sev}" data-k="${o.cities.indexOf(c)}" cx="${px(c.lon).toFixed(1)}" cy="${py(c.lat).toFixed(1)}" r="${rad(c).toFixed(1)}"/>`;
+      });
+      o.cities.filter((c) => c.sev === 'critical').forEach((c) => {
+        const r = rad(c), cx = px(c.lon), right = cx + r + 8 + c.name.length * 8 < W;
+        s += `<text class="city-l" x="${right ? cx + r + 5 : cx - r - 5}" y="${py(c.lat) + 4}" text-anchor="${right ? 'start' : 'end'}">${esc(c.name)}</text>`;
+      });
+      el.innerHTML = s + '</svg>';
+      $$('.cb', el).forEach((c) => { const ct = o.cities[+c.dataset.k]; const on = (ev) => showTip(ev, o.tip(ct)); c.addEventListener('pointermove', on); c.addEventListener('pointerdown', on); c.addEventListener('pointerleave', hideTip); });
+    });
+  }
+
+  function spark(values, cls) {
+    const w = 120, h = 30, max = Math.max(...values), min = Math.min(...values), r = max - min || 1;
+    const pts = values.map((v, i) => [(i / (values.length - 1)) * (w - 6) + 3, h - 4 - ((v - min) / r) * (h - 8)]);
+    const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join('');
+    const last = pts[pts.length - 1];
+    return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><path class="ln-thin ${cls}" d="${d}"/><circle class="dot ${cls}" cx="${last[0]}" cy="${last[1]}" r="3"/></svg>`;
+  }
+
+  // ---------- piezas de interfaz ----------
+  function tile(o) {
+    const delta = o.delta == null ? '' : `<span class="delta ${o.deltaGood == null ? '' : o.deltaGood ? 'up' : 'down'}">${signed(o.delta, 1)}${o.deltaUnit ?? '%'} <span>${esc(o.deltaLabel || 'vs periodo anterior')}</span></span>`;
+    return `<article class="tile">
+      <header><h3>${esc(o.label)}</h3>${o.info ? `<span class="info" tabindex="0" data-tip="${esc(o.info)}">i</span>` : ''}</header>
+      <div class="val">${o.value}</div>
+      ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
+      <footer>${o.sev ? chip(o.sev, o.sevText) : ''}${delta}${o.spark ? spark(o.spark, o.sparkCls || 's-so') : ''}</footer>
+    </article>`;
+  }
+  const card = (title, sub, body, o = {}) => `<section class="card ${o.cls || ''}"><header class="card-h"><div><h2>${esc(title)}</h2>${sub ? `<p>${sub}</p>` : ''}</div>${o.src ? `<span class="src" title="Fuente en Fabric: ${esc(o.src)}">${icon('db')}<span>${esc(o.src)}</span></span>` : ''}</header>${body}</section>`;
+  const legend = (items) => `<div class="legend">${items.map(([cls, t, kind]) => `<span><i class="sw ${cls} ${kind || ''}"></i>${esc(t)}</span>`).join('')}</div>`;
+  const table = (cols, rows, o = {}) => `<div class="tbl-wrap"><table class="tbl ${o.cls || ''}"><thead><tr>${cols.map((c) => `<th class="${c.num ? 'num' : ''}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody>${o.foot ? `<tfoot>${o.foot}</tfoot>` : ''}</table></div>`;
+  const empty = (t) => `<p class="empty">${esc(t)}</p>`;
+  function freshness(chainIds, withSap = true) {
+    const items = [];
+    if (withSap) items.push(`<span class="fr ok">${icon('check')}SAP Sell-In · 13 oct</span>`);
+    chainIds.forEach((id) => {
+      const c = D.chainById[id];
+      items.push(c.delayDays > 2
+        ? `<span class="fr late">${icon('alert')}${esc(c.short)} · ${c.lastCutLabel} · ${c.delayDays} días de retraso</span>`
+        : `<span class="fr ok">${icon('check')}${esc(c.short)} · ${c.lastCutLabel}${c.daily ? '' : ' (semanal)'}</span>`);
+    });
+    return `<div class="fresh"><span class="fresh-l">${icon('clock')}Corte de cada fuente</span>${items.join('')}</div>`;
+  }
+  function head(p, finding, extra = '') {
+    return `<div class="screen-head">
+      <p class="eyebrow">Tablero ${p.board} de 6 · ${esc(p.boardName)}</p>
+      <h1>${esc(p.q)}</h1>
+      <div class="finding"><span class="finding-l">Hallazgo</span><p>${finding}</p></div>
+      ${extra}
+    </div>`;
+  }
+  const moneyTip = (i, W, siV, soV, si, so) => tipRows(`${wlab(W[i])} · ${D.WEEKS[W[i]].range}`, [
+    ['s-si', 'Sell-In', si[i] ? `${MXN(siV[i])} · ${K(si[i])} pzas` : 'sin pedido'],
+    ['s-so', 'Sell-Out', `${MXN(soV[i])} · ${K(so[i])} pzas`],
+    ['', 'Sell-through', si[i] ? P((so[i] / si[i]) * 100) : '—'],
+  ]);
+
+  // ======================= PANTALLAS =======================
+
+  // ---- 1 · Dirección y Finanzas ----
+  function screenFinanzas(p) {
+    const W = fWeeks(), PW = fPrev(), ch = fChains('finanzas'), pr = fProds(false), prTop = fProds(true);
+    const k = D.kpis(ch, pr, W), pk = PW && D.kpis(ch, pr, PW);
+    const rows = ch.map((id) => {
+      const c = D.chainById[id];
+      return { c, k: D.kpis([id], pr, W), st: D.chainStatus(c, pr), oos: c.stores ? D.oosFor([id], prTop).pct : null };
+    }).sort((a, b) => b.k.siV - a.k.siV);
+    const al = D.ALERTS.filter((a) => alertInScope(a, ch, pr));
+    const worst = rows.length > 1 ? rows.filter((r) => r.k.st != null).sort((a, b) => a.k.st - b.k.st)[0] : null;
+    const stuck = D.sum(al.filter((a) => a.rule.id === 'sobreinv').map((a) => a.invValue));
+    const crit = al.filter((a) => a.rule.sev === 'critical').length;
+    const to = ch.length > 1 ? `a las ${ch.length} cadenas conectadas` : `a ${esc(D.chainById[ch[0]].name)}`;
+    const finding = `En ${FIL.period} semanas facturamos <b>${MXN(k.siV)}</b> ${to}${prodLabel() ? ` en ${esc(prodLabel())}` : ''} y el consumidor se llevó <b>${F(k.st, 0)} de cada 100 piezas</b>.`
+      + (worst ? ` La cadena más baja es <b>${esc(worst.c.short)} (${P(worst.k.st)})</b>.` : '')
+      + (stuck ? ` Hay <b>${MXN(stuck)}</b> de inventario en productos con sobreinventario.` : '')
+      + (crit ? ` ${crit} ${crit === 1 ? 'alerta crítica' : 'alertas críticas'} para actuar hoy.` : '');
+    const gapPct = k.siV ? (k.gapV / k.siV) * 100 : 0;
+    const siV = D.series(ch, pr, 'si', W, true), soV = D.series(ch, pr, 'so', W, true);
+    const si = D.series(ch, pr, 'si', W), so = D.series(ch, pr, 'so', W);
+    const oosAll = ch.some((c) => physical.includes(c)) ? D.oosFor(ch.filter((c) => physical.includes(c)), prTop).pct : null;
+    const html = head(p, finding, freshness(ch)) + `
+      <div class="tiles">
+        ${tile({ label: 'Sell-In', value: MXN(k.siV), sub: `${K(k.si)} piezas · facturado en SAP`, delta: pk && pct(k.siV, pk.siV), spark: siV, sparkCls: 's-si', info: 'Lo que L’Oréal facturó a las cadenas en SAP (gold.fact_sell_in), valuado a precio neto. Las cajas se convierten a piezas con el maestro de materiales.' })}
+        ${tile({ label: 'Sell-Out', value: MXN(k.soV), sub: `${K(k.so)} piezas · venta al consumidor`, delta: pk && pct(k.soV, pk.soV), deltaGood: pk ? k.soV >= pk.soV : null, spark: soV, info: 'Lo que el consumidor compró en las cadenas según el integrador (gold.fact_sell_out), valuado al mismo precio neto para que se compare con el Sell-In.' })}
+        ${tile({ label: 'Sell-through', value: P(k.st), sub: 'Sell-Out ÷ Sell-In, en piezas', sev: stStatus(k.st), delta: pk && k.st - pk.st, deltaUnit: ' pts', deltaGood: pk ? k.st >= pk.st : null, info: 'Sell-Out ÷ Sell-In del periodo. Meta: 95% o más. Entre 85% y 95% se vigila; menos de 85% indica que el canal acumula inventario.' })}
+        ${tile({ label: 'Brecha Sell-In − Sell-Out', value: MXN(k.gapV), sub: k.gapV >= 0 ? `${P(gapPct)} de lo facturado se quedó en el canal` : 'El canal vendió más de lo que compró', sev: gapPct <= 3 ? 'good' : gapPct <= 8 ? 'warning' : 'critical', info: 'Sell-In − Sell-Out del periodo, valuado a precio neto. Es el inventario que se sumó (o bajó) en las cadenas.' })}
+      </div>
+      <div class="grid-2">
+        ${card('Sell-In vs Sell-Out por semana', `${esc(scopeLabel(ch, W))} · pesos a precio neto`, legend([['s-si', 'Sell-In (SAP)', 'line'], ['s-so', 'Sell-Out (integrador)', 'line']]) + '<div class="chart" id="c-exec"></div><p class="note">El Sell-In sube y baja con los pedidos de las cadenas; el Sell-Out es el consumo real y es más estable.</p>', { src: 'gold.fact_sell_in · gold.fact_sell_out' })}
+        ${card('Alertas más relevantes', `${al.length} activas con estos filtros · reglas de la Tabla 24`, al.length ? `<ol class="alerts">${al.slice(0, 5).map(alertItem).join('')}</ol>` : empty('Sin alertas con estos filtros.'), { src: 'Fabric Activator' })}
+      </div>
+      ${card('Desempeño por cadena', `${esc(periodLabel(W))} · el semáforo usa las mismas reglas para todas las cadenas`, table(
+        [{ t: 'Cadena' }, { t: 'Sell-In', num: 1 }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-through', num: 1 }, { t: 'Días de inv.', num: 1 }, { t: 'OOS', num: 1 }, { t: 'Estado' }],
+        rows.map((r) => `<tr><td><b>${esc(r.c.name)}</b><span class="muted-s">${esc(r.c.type)}</span></td><td class="num">${MXN(r.k.siV)}</td><td class="num">${MXN(r.k.soV)}</td><td class="num">${P(r.k.st)}</td><td class="num">${F(r.k.doi, 0)}</td><td class="num">${r.oos == null ? '<span class="muted-s">sin tienda</span>' : P(r.oos)}</td><td>${chip(r.st.sev, r.st.text)}</td></tr>`),
+        { foot: rows.length > 1 ? `<tr><td>Total</td><td class="num">${MXN(k.siV)}</td><td class="num">${MXN(k.soV)}</td><td class="num">${P(k.st)}</td><td class="num">${F(k.doi, 0)}</td><td class="num">${P(oosAll)}</td><td></td></tr>` : '' }), { src: 'gold.fact_* · gold.conciliacion · dim_cliente' })}
+      ${coverage()}
+    `;
+    const after = () => lineChart($('#c-exec'), {
+      aria: 'Sell-In y Sell-Out semanales en pesos', labels: W.map(wlab), endLabels: true, money: true, fmt: MXN,
+      series: [{ name: 'Sell-In', cls: 's-si', values: siV }, { name: 'Sell-Out', cls: 's-so', values: soV }],
+      tip: (i) => moneyTip(i, W, siV, soV, si, so),
+    });
+    return { html, after };
+  }
+  function alertItem(a) {
+    const t = personaById[alertTarget(a)];
+    const val = a.rule.id === 'sobreinv' ? `${MXN(a.invValue)} de inventario en la cadena`
+      : a.rule.id === 'llenado' ? `${MXN(a.value)} facturados por encima de lo vendido en 4 semanas`
+        : a.rule.id === 'quiebre' ? `${MXN(a.lost)} de venta perdida en este quiebre` : '';
+    return `<li class="alert a-${a.rule.sev}">
+      <div class="alert-top">${chip(a.rule.sev, a.rule.name)}<span class="to">${icon('bell')}${esc(a.rule.to)} · ${esc(a.rule.channel)}</span></div>
+      <p class="alert-t">${esc(a.title)}</p>
+      <p class="alert-m">${esc(a.metric)}${val ? ` · <b>${val}</b>` : ''}</p>
+      <button type="button" class="link-btn" data-go="${t.id}">Abrir tablero ${t.board} como ${esc(t.name.split(' ')[0])} ${icon('arrow')}</button>
+    </li>`;
+  }
+  function coverage() {
+    const A = D.ASSUME;
+    const names = { 1: 'Autoservicio de mayor peso y comercio electrónico', 2: 'Cadenas restantes del integrador y más categorías', 3: 'Farmacias, departamentales y canal indirecto' };
+    const segs = A.channels.map((c) => `<div class="seg-c st${c.stage}" style="flex:${c.share}" data-tip="${esc(`Etapa ${c.stage} · ${c.name}: ${P(c.share * 100, 1)} de la venta, ≈ ${MXN(c.share * A.annualMXN)} al año`)}"><span>${c.share >= 0.07 ? P(c.share * 100, 0) : ''}</span></div>`).join('');
+    const leg = [1, 2, 3].map((s) => {
+      const sh = D.sum(A.channels.filter((c) => c.stage === s).map((c) => c.share));
+      return `<div class="cov-i"><i class="sw cst${s}"></i><div><b>Etapa ${s} · ${P(sh * 100, 1)}</b><span>${names[s]}${s === 1 ? ' · <b>conectada en este prototipo</b>' : ''}</span><span class="mono-n">≈ ${MXN(sh * A.annualMXN)} al año</span></div></div>`;
+    }).join('');
+    return card('Cobertura del data link sobre la venta de L’Oréal México', `Venta anual de referencia €1,000 M ≈ ${MXN(A.annualMXN)} · etapas de la Tabla 27 de la propuesta`,
+      `<div class="cov-bar" role="img" aria-label="Etapa 1 cubre ${P(A.connected * 100, 1)} de la venta anual">${segs}</div><div class="cov-leg">${leg}</div><p class="note">Hoy los tableros ven ${P(A.connected * 100, 1)} de la venta. Las etapas 2 y 3 agregan fuentes sin rehacer el modelo: cada cadena nueva entra por las mismas capas Bronze, Silver y Gold.</p>`,
+      { src: 'Supuesto del equipo · mezcla por canal' });
+  }
+
+  // ---- 2 · KAM Walmart ----
+  function screenKam(p) {
+    const W = fWeeks(), PW = fPrev(), ch = ['walmart'], pr = fProds(false), prTop = fProds(true);
+    const k = D.kpis(ch, pr, W), pk = PW && D.kpis(ch, pr, PW);
+    const al = D.ALERTS.filter((a) => a.chain.id === 'walmart' && alertInScope(a, ch, pr));
+    const a = al.find((x) => x.rule.id === 'sobreinv');
+    const oos = D.oosFor(ch, prTop).pct;
+    const cv = a ? D.kpis(ch, a.prods.map((x) => x.id), D.W8) : null;
+    const finding = a
+      ? `En 8 semanas Walmart nos compró <b>${MXN(cv.siV)} de ${esc(a.brand)}</b> y vendió <b>${MXN(cv.soV)}</b> al consumidor: sell-through de <b>${P(cv.st, 0)}</b> y ${F(a.doi, 0)} días de inventario (${MXN(a.invValue)} en CEDIS y tiendas). Es el dato para la próxima reunión con el comprador.`
+      : `Walmart vendió al consumidor <b>${F(k.st, 0)} de cada 100 piezas</b> que nos compró en ${FIL.period} semanas y tiene ${F(k.doi, 0)} días de inventario. Con estos filtros no hay alertas de sobreinventario.`;
+    const siV = D.series(ch, pr, 'si', W, true), soV = D.series(ch, pr, 'so', W, true);
+    const si = D.series(ch, pr, 'si', W), so = D.series(ch, pr, 'so', W);
+    const blocks = [[40, 43], [44, 47], [48, 51]];
+    const cats = FIL.cat !== 'all' ? [FIL.cat] : catsForDiv(FIL.div);
+    const matrix = cats.map((cat) => {
+      const prods = D.PRODUCTS.filter((x) => x.cat === cat && inFil(x)).map((x) => x.id);
+      return { cat, cells: blocks.map(([a0, b0]) => { const w = D.range(a0, b0); const kk = D.kpis(ch, prods, w); return { st: kk.st, siV: kk.siV, soV: kk.soV, w }; }) };
+    });
+    const cell = (c) => {
+      if (c.st == null) return '<td class="hm">—</td>';
+      const t = Math.min(1, Math.abs(c.st - 100) / 40), pole = c.st < 100 ? 'var(--div-neg)' : 'var(--div-pos)';
+      return `<td class="hm" style="background:color-mix(in oklab, ${pole} ${Math.round(t * 78)}%, var(--div-mid));color:${t > 0.55 ? '#fff' : 'var(--ink)'}" data-tip="${esc(`${wlab(c.w[0])}–${wlab(c.w[3])} · Sell-In ${MXN(c.siV)} · Sell-Out ${MXN(c.soV)}`)}">${P(c.st, 0)}</td>`;
+    };
+    const hot = matrix.map((r) => ({ cat: r.cat, st: r.cells[2].st })).filter((r) => r.st != null).sort((x, y) => y.st - x.st)[0];
+    const talk = [];
+    if (a) talk.push({ sev: 'critical', tag: a.brand, text: `Compró ${MXN(cv.siV)} y vendió ${MXN(cv.soV)} en 8 semanas (${P(cv.st, 0)}). Proponer pausar el siguiente pedido hasta bajar de ${F(a.doi, 0)} a 35 días de inventario.` });
+    al.filter((x) => x !== a).slice(0, 1).forEach((x) => talk.push({ sev: x.rule.sev, tag: x.rule.name, text: `${x.title}. ${x.metric}.` }));
+    if (hot && hot.st > 100) talk.push({ sev: 'warning', tag: hot.cat, text: `Vende más de lo que compra (${P(hot.st, 0)} en ${wlab(48)}–${wlab(51)}). Revisar que el pedido cubra la demanda para no generar quiebres.` });
+    talk.push({ sev: doiStatus(k.doi), tag: 'Inventario total', text: `${F(k.doi, 0)} días de inventario y ${P(oos)} de OOS en tiendas${a ? `: la cuenta está sana fuera de ${a.brand}` : ''}.` });
+    const tops = D.TOP.filter((x) => prTop.includes(x.id)).map((x) => ({ x, kk: D.kpis(ch, [x.id], W), cs: D.CASES.find((c) => c.chain.id === 'walmart' && c.prod.id === x.id) }))
+      .sort((m, n) => (m.kk.st ?? 999) - (n.kk.st ?? 999));
+    const rest = D.PRODUCTS.filter((x) => !x.top && inFil(x));
+    const kr = rest.length ? D.kpis(ch, rest.map((x) => x.id), W) : null;
+    const html = head(p, finding, `<div class="rls">${icon('lock')}<div><b>Ves solo Walmart de México.</b> Las otras 6 cadenas están ocultas por la regla de seguridad por fila (tabla usuario → cadena asignada en el modelo semántico).</div></div>` + freshness(ch)) + `
+      <div class="tiles">
+        ${tile({ label: 'Sell-In a Walmart', value: MXN(k.siV), sub: `${K(k.si)} piezas · facturado a sus CEDIS`, delta: pk && pct(k.siV, pk.siV), spark: siV, sparkCls: 's-si', info: 'Facturación a los CEDIS de Walmart en SAP, a precio neto.' })}
+        ${tile({ label: 'Sell-Out en Walmart', value: MXN(k.soV), sub: `${K(k.so)} piezas · ${N(D.chainById.walmart.stores)} tiendas`, delta: pk && pct(k.soV, pk.soV), deltaGood: pk ? k.soV >= pk.soV : null, spark: soV })}
+        ${tile({ label: 'Sell-through', value: P(k.st), sub: 'Sell-Out ÷ Sell-In, en piezas', sev: stStatus(k.st), delta: pk && k.st - pk.st, deltaUnit: ' pts', deltaGood: pk ? k.st >= pk.st : null, info: 'Sell-Out ÷ Sell-In. Meta: 95% o más.' })}
+        ${tile({ label: 'Días de inventario', value: F(k.doi, 0) + ' <small>días</small>', sub: `OOS en tiendas: ${P(oos)}`, sev: doiStatus(k.doi), info: 'Inventario reportado por Walmart ÷ Sell-Out diario promedio de los últimos 28 días.' })}
+      </div>
+      ${card('Lo que compró vs lo que vendió, por semana', `Walmart de México · ${esc([prodLabel(), periodLabel(W)].filter(Boolean).join(' · '))} · pesos a precio neto`, legend([['s-si', 'Sell-In (pedidos a SAP)'], ['s-so', 'Sell-Out (venta al consumidor)']]) + '<div class="chart" id="c-kam"></div><p class="note">Walmart pide cada dos semanas; por eso el Sell-In aparece una semana sí y otra no.</p>', { src: 'gold.fact_sell_in · gold.fact_sell_out · RLS' })}
+      <div class="grid-2">
+        ${card('Sell-through por categoría', 'Bloques de 4 semanas · menos de 100% significa que Walmart acumuló inventario', table([{ t: 'Categoría' }, ...blocks.map(([a0, b0]) => ({ t: `${wlab(a0)}–${wlab(b0)}`, num: 1 }))], matrix.map((r) => `<tr><td>${esc(r.cat)}</td>${r.cells.map(cell).join('')}</tr>`), { cls: 'heat' }) + `<div class="div-legend"><span>Acumula inventario</span><i></i><span>Vende más de lo que compra</span></div>`, { src: 'gold.fact_* · dim_producto' })}
+        ${card('Para la reunión con el comprador', 'Puntos que salen de los datos de esta pantalla', `<ol class="talk">${talk.slice(0, 3).map((t) => `<li>${chip(t.sev, t.tag)}<p>${esc(t.text)}</p></li>`).join('')}</ol>`)}
+      </div>
+      ${card('Productos prioritarios en Walmart', `${esc(periodLabel(W))} · del sell-through más bajo al más alto · cada código de Walmart ya está ligado al material SAP`, tops.length ? table(
+        [{ t: 'Producto' }, { t: 'Código Walmart' }, { t: 'Material SAP' }, { t: 'Sell-In', num: 1 }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-through', num: 1 }, { t: 'Días de inv.', num: 1 }],
+        tops.map(({ x, kk, cs }) => `<tr class="${cs.cls !== 'Normal' ? 'hl' : ''}"><td><b>${esc(x.brand)}</b> ${esc(x.name)}</td><td class="mono">${x.codes.walmart}</td><td class="mono">${x.sap}</td><td class="num">${MXN(kk.siV)}</td><td class="num">${MXN(kk.soV)}</td><td class="num">${P(kk.st, 0)}</td><td class="num">${cs.cls !== 'Normal' ? chip('critical', F(cs.doi, 0) + ' · ' + cs.cls) : F(cs.doi, 0)}</td></tr>`),
+        { foot: kr ? `<tr><td colspan="3">Resto del portafolio · ≈ ${N(D.sum(rest.map((x) => x.skus)))} SKUs agregados por marca y categoría</td><td class="num">${MXN(kr.siV)}</td><td class="num">${MXN(kr.soV)}</td><td class="num">${P(kr.st, 0)}</td><td class="num">${F(kr.doi, 0)}</td></tr>` : '' }) : empty('Sin productos con estos filtros.'), { src: 'silver.map_producto_cadena · dim_producto' })}`;
+    const after = () => barChart($('#c-kam'), {
+      aria: 'Sell-In y Sell-Out semanales de Walmart en pesos', labels: W.map(wlab), money: true,
+      series: [{ cls: 's-si', values: siV }, { cls: 's-so', values: soV }],
+      tip: (i) => moneyTip(i, W, siV, soV, si, so),
+    });
+    return { html, after };
+  }
+
+  // ---- 3 · Demand Planning ----
+  function screenDemand(p) {
+    const W = fWeeks(), PW = fPrev(), ch = fChains('demand'), pr = fProds(false), prTop = fProds(true);
+    const k = D.kpis(ch, pr, W), pk = PW && D.kpis(ch, pr, PW);
+    const cases = D.CASES.filter((c) => ch.includes(c.chain.id) && prTop.includes(c.prod.id));
+    const ex = cases.filter((c) => c.cls === 'Exceso'), rk = cases.filter((c) => c.cls === 'Riesgo');
+    const invV = (c) => c.reported * c.prod.net;
+    const exV = D.sum(ex.map(invV));
+    const invTotal = D.sum(ch.flatMap((c) => D.PRODUCTS.filter(inFil).map((x) => D.FACTS[c][x.id].reported * x.net)));
+    const urgent = [...rk].sort((a, b) => a.doi - b.doi)[0];
+    const rc = D.recon(ch, pr, W), bad = rc.filter((r) => r.flag);
+    const finding = `De ${cases.length} combinaciones cadena-producto prioritario, <b>${ex.length} ${ex.length === 1 ? 'tiene' : 'tienen'} exceso</b>${ex.length ? ` (${MXN(exV)} de inventario con más de 45 días de cobertura)` : ''} y <b>${rk.length} ${rk.length === 1 ? 'está' : 'están'} en riesgo de quiebre</b>.`
+      + (urgent ? ` La más urgente: ${esc(urgent.prod.brand)} ${esc(urgent.prod.name.split(' ')[0])} en ${esc(urgent.chain.short)}, con <b>${F(urgent.doi)} días</b> de inventario.` : '')
+      + (bad.length ? ` Además, el inventario de ${bad.map((r) => `${esc(r.chain.short)} no cuadra (${signed(r.diff, 0)}%)`).join(' y ')}.` : '');
+    const out = [...rk, ...ex].sort((a, b) => (a.cls === b.cls ? b.doi - a.doi : a.cls === 'Riesgo' ? -1 : 1));
+    const html = head(p, finding, freshness(ch)) + `
+      <div class="tiles">
+        ${tile({ label: 'Días de inventario en el canal', value: F(k.doi, 0) + ' <small>días</small>', sub: `${MXN(invTotal)} de inventario en las cadenas`, sev: doiStatus(k.doi), info: 'Inventario reportado por las cadenas ÷ Sell-Out diario promedio de los últimos 28 días.' })}
+        ${tile({ label: 'Rotación', value: F(k.turnover, 1) + ' <small>veces</small>', sub: `En ${FIL.period} semanas`, delta: pk && pk.turnover ? k.turnover - pk.turnover : null, deltaUnit: '', deltaGood: pk ? k.turnover >= pk.turnover : null, info: 'Sell-Out del periodo ÷ inventario promedio ((inicial + final) ÷ 2).' })}
+        ${tile({ label: 'Casos en exceso', value: String(ex.length), sub: ex.length ? `${MXN(exV)} de inventario detenido` : 'Más de 45 días de inventario', sev: ex.length ? 'critical' : 'good', sevText: ex.length ? 'Ajustar pedidos' : 'Sin casos' })}
+        ${tile({ label: 'Casos en riesgo de quiebre', value: String(rk.length), sub: 'Menos de 7 días de inventario', sev: rk.length ? 'critical' : 'good', sevText: rk.length ? 'Acelerar surtido' : 'Sin casos' })}
+      </div>
+      ${card('Cobertura vs sell-through por cadena y producto', `Cada punto es una combinación cadena-producto prioritario (${cases.length}) · sell-through de las últimas 8 semanas`, cases.length ? legend([['pt-Normal', 'Normal', 'dot'], ['pt-Exceso', 'Exceso', 'dot'], ['pt-Riesgo', 'Riesgo de quiebre', 'dot']]) + '<div class="chart" id="c-scatter"></div>' : empty('Sin productos con estos filtros.'), { src: 'gold.fact_inventario · gold.fact_sell_out' })}
+      ${card('Casos fuera de rango', 'Para la revisión del S&OP mensual', out.length ? table(
+          [{ t: 'Cadena' }, { t: 'Producto' }, { t: 'Días inv.', num: 1 }, { t: 'Inventario', num: 1 }, { t: 'Sell-through 8 sem', num: 1 }, { t: 'Qué hacer' }],
+          out.map((c) => `<tr><td>${esc(c.chain.short)}</td><td><b>${esc(c.prod.brand)}</b> ${esc(c.prod.name)}</td><td class="num">${chip('critical', F(c.doi, 0) + ' · ' + c.cls)}</td><td class="num">${MXN(invV(c))}</td><td class="num">${P(c.st8, 0)}</td><td>${c.cls === 'Exceso' ? 'Reducir o pausar pedidos' : 'Acelerar surtido'}</td></tr>`)) : empty('Ningún caso fuera de rango con estos filtros.'), { src: 'gold.fact_inventario' })}
+      ${card('Conciliación de inventario', `Inventario implícito (inicial + Sell-In − Sell-Out) frente al que reporta la cadena · ${esc(periodLabel(W))}`, table(
+          [{ t: 'Cadena' }, { t: 'Implícito (pzas)', num: 1 }, { t: 'Reportado (pzas)', num: 1 }, { t: 'Diferencia', num: 1 }, { t: 'Estado' }],
+          rc.map((r) => `<tr class="${r.flag ? 'hl' : ''}"><td>${esc(r.chain.short)}</td><td class="num">${K(r.implicit)}</td><td class="num">${K(r.reported)}</td><td class="num">${signed(r.diff, 1)}%</td><td>${r.flag ? chip('warning', 'Revisar') : chip('good', 'Cuadra')}</td></tr>`)) +
+          (bad.some((r) => r.chain.id === 'heb') ? '<p class="note">HEB supera el umbral de 15%. Su último lote de inventario llegó con 36% menos registros (regla C05 en Salud del dato): revisar antes de decidir un pedido.</p>' : ''), { src: 'gold.conciliacion' })}`;
+    const pts = cases.map((c) => ({ x: c.doi, y: c.st8, cls: c.cls, c }));
+    const lab = [], grp = {};
+    cases.filter((c) => c.cls !== 'Normal').forEach((c) => { const key = c.chain.id + c.prod.brand; (grp[key] = grp[key] || []).push(c); });
+    Object.values(grp).forEach((g) => { const top = g.reduce((a, b) => (a.st8 > b.st8 ? a : b)); lab.push({ x: top.doi, y: top.st8, text: g.length > 1 ? `${top.chain.short} · ${top.prod.brand} (${g.length})` : `${top.chain.short} · ${top.prod.name.split(' ')[0]}`, low: g.reduce((a, b) => (a.st8 < b.st8 ? a : b)).st8 }); });
+    const after = () => cases.length && scatter($('#c-scatter'), {
+      aria: 'Días de inventario contra sell-through por cadena y producto', points: pts, labels: lab, h: 340,
+      tip: (pt) => tipRows(`${pt.c.chain.short} · ${pt.c.prod.brand}`, [['', pt.c.prod.name, ''], ['', 'Días de inventario', F(pt.c.doi)], ['', 'Inventario', MXN(invV(pt.c))], ['', 'Sell-through 8 sem', P(pt.c.st8, 0)], ['', 'Clasificación', pt.c.cls]]),
+    });
+    return { html, after };
+  }
+
+  // ---- 4 · Disponibilidad y quiebres ----
+  function screenComercial(p) {
+    const ch = fChains('comercial'), prTop = fProds(true);
+    const rows = D.SKU_STORE.filter((r) => ch.includes(r.store.chain) && prTop.includes(r.prod.id));
+    const oos = D.M.oos(D.sum(rows.map((r) => r.zero)), rows.length * D.NDAYS);
+    const active = rows.filter((r) => r.activeDays > 0), long = active.filter((r) => r.activeDays >= 2);
+    const lost28 = D.sum(rows.map((r) => r.lost28Pesos));
+    const stores = D.STORES.filter((s) => ch.includes(s.chain));
+    const longStores = new Set(long.map((r) => r.store.id));
+    const qa = D.ALERTS.find((a) => a.rule.id === 'quiebre' && alertInScope(a, ch, prTop));
+    const byProd = {};
+    active.forEach((r) => { byProd[r.prod.id] = (byProd[r.prod.id] || 0) + r.lostPesos; });
+    const activeLost = D.sum(Object.values(byProd));
+    const qShare = qa && activeLost ? (byProd[qa.prods[0].id] / activeLost) * 100 : 0;
+    const yearly = (lost28 * 365) / D.NDAYS;
+    const finding = qa
+      ? `<b>${esc(qa.prods[0].brand)} ${esc(qa.prods[0].name)}</b> está agotado en <b>${qa.stores.length} tiendas de ${esc(qa.chain.short)}</b>, sobre todo en ${qa.cities.slice(0, 2).map(([c, n]) => `${esc(c)} (${n})`).join(' y ')}, hasta ${qa.maxDays} días seguidos: es el producto que más venta pierde hoy (${P(qShare, 0)} de los quiebres activos). En 28 días los quiebres sumaron <b>${MXN(lost28)}</b> de venta perdida, ≈ ${MXN(yearly)} al año a este ritmo.`
+      : `En 28 días los quiebres sumaron <b>${MXN(lost28)}</b> de venta perdida, ≈ ${MXN(yearly)} al año a este ritmo. Con estos filtros no hay un quiebre que active la alerta (3% de las tiendas de la cadena o más).`;
+    // mapa por ciudad: tiendas con quiebre de 2+ días frente al promedio del alcance
+    const base = stores.length ? longStores.size / stores.length : 0;
+    const cm = {};
+    stores.forEach((s) => { const c = cm[s.city] || (cm[s.city] = { name: s.city, lat: D.CITY[s.city][0], lon: D.CITY[s.city][1], stores: 0, outSet: new Set(), skus: {} }); c.stores++; });
+    long.forEach((r) => { const c = cm[r.store.city]; c.outSet.add(r.store.id); c.skus[r.prod.id] = (c.skus[r.prod.id] || 0) + 1; });
+    const cities = Object.values(cm).map((c) => {
+      const out = c.outSet.size, rate = out / c.stores, ratio = base ? rate / base : 0;
+      const sev = ratio >= 1.8 && c.stores >= 20 ? 'critical' : ratio >= 1.3 && c.stores >= 10 ? 'warning' : 'good';
+      return { ...c, out, pct: rate * 100, ratio, sev, top: Object.entries(c.skus).sort((x, y) => y[1] - x[1]).slice(0, 2) };
+    });
+    const rowsT = [...active].sort((a, b) => b.activeDays - a.activeDays || b.lostPesos - a.lostPesos).slice(0, 10);
+    const totalLost = activeLost;
+    let acc = 0;
+    const items = Object.entries(byProd).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([id, v]) => { acc += v; const pr = D.prodById[id]; return { label: `${pr.brand} ${pr.name}`, v, text: `${MXN(v)} · ${P((acc / totalLost) * 100, 0)} acum.`, cls: qa && id === qa.prods[0].id ? 's-crit' : 's-so', share: (v / totalLost) * 100 }; });
+    const physNote = ch.length === physical.length ? `<b>las 5 cadenas con tienda física</b>` : `<b>${esc(D.chainById[ch[0]].name)}</b>`;
+    const html = head(p, finding, `<div class="rls soft">${icon('eye')}<div>Este tablero muestra ${physNote} y los 20 SKUs prioritarios con detalle por tienda. Mercado Libre y Amazon no tienen anaquel: su disponibilidad se ve en Inventario y cobertura.</div></div>` + freshness(ch)) + `
+      <div class="tiles">
+        ${tile({ label: 'OOS en anaquel', value: P(oos), sub: 'Tienda-SKU-día sin inventario · 28 días', sev: oosStatus(oos), info: 'Combinaciones tienda-SKU-día con inventario en cero ÷ total de combinaciones activas, últimos 28 días. Meta: menos de 4.5%.' })}
+        ${tile({ label: 'Quiebres de 2 días o más', value: N(long.length), sub: `${N(active.length)} quiebres activos hoy en total`, sev: qa ? 'critical' : long.length ? 'warning' : 'good', sevText: qa ? '1 alerta activa' : long.length ? 'Vigilar' : 'Sin quiebres largos' })}
+        ${tile({ label: 'Venta perdida · 28 días', value: MXN(lost28), sub: 'Venta diaria promedio × días en cero', info: 'Sell-Out diario promedio de 28 días × días con inventario en cero, valuado a precio neto.' })}
+        ${tile({ label: 'Tiendas con quiebre largo', value: `${N(longStores.size)} <small>de ${N(stores.length)}</small>`, sub: `${P(base * 100, 0)} de las tiendas tiene algún SKU 2+ días en cero` })}
+      </div>
+      <div class="grid-2 wide-l">
+        ${card('Quiebres por ciudad', `${N(stores.length)} tiendas en ${cities.length} ciudades · tamaño por número de tiendas · color frente al promedio (${P(base * 100, 0)})`, legend([['cst-good', 'Hasta 1.3× el promedio', 'dot'], ['cst-warning', '1.3× a 1.8×', 'dot'], ['cst-critical', 'Más de 1.8×', 'dot']]) + '<div class="chart map" id="c-map"></div>', { src: 'gold.fact_inventario · dim_tienda' })}
+        ${card('Dónde empezar el reabasto', `Venta perdida en los quiebres activos de hoy (${MXN(activeLost)}), por producto`, items.length ? '<div class="chart" id="c-pareto"></div><p class="note">Pocos productos explican la mayor parte de la pérdida: el reabasto empieza por arriba de la lista.</p>' : empty('Sin quiebres activos con estos filtros.'), { src: 'gold.fact_inventario · dim_producto' })}
+      </div>
+      ${card('Quiebres activos', 'Los 10 más largos · días consecutivos en cero hasta hoy', rowsT.length ? table(
+        [{ t: 'Tienda' }, { t: 'Cadena' }, { t: 'Ciudad' }, { t: 'Producto' }, { t: 'Días', num: 1 }, { t: 'Venta perdida', num: 1 }],
+        rowsT.map((r) => `<tr class="${r.activeDays >= 2 ? 'hl' : ''}"><td><b>${esc(r.store.name)}</b><span class="muted-s mono">${r.store.code}</span></td><td>${esc(D.chainById[r.store.chain].short)}</td><td>${esc(r.store.city)}</td><td>${esc(r.prod.brand)} ${esc(r.prod.name)}</td><td class="num">${r.activeDays >= 2 ? chip('critical', r.activeDays + ' días') : '1 día'}</td><td class="num">${MXN(r.lostPesos)}</td></tr>`)) : empty('Sin quiebres activos.'), { src: 'gold.fact_inventario (diario)' })}`;
+    const after = () => {
+      mapChart($('#c-map'), {
+        aria: 'Mapa de quiebres por ciudad', cities,
+        tip: (c) => tipRows(c.name, [['', 'Tiendas', N(c.stores)], ['', 'Con quiebre de 2+ días', `${N(c.out)} · ${P(c.pct, 0)}`], ['', 'Frente al promedio', F(c.ratio, 1) + '×'], ...c.top.map(([id, n]) => ['', `${D.prodById[id].brand} ${D.prodById[id].name.split(' ').slice(0, 2).join(' ')}`, `${n} tiendas`])]),
+      });
+      if (items.length) hbars($('#c-pareto'), { aria: 'Venta perdida por producto', items, tip: (it) => tipRows(it.label, [['', 'Venta perdida en quiebres activos', MXN(it.v)], ['', 'Parte del total', P(it.share, 0)]]) });
+    };
+    return { html, after };
+  }
+
+  // ---- 5 · Promociones ----
+  let promoSel = 'hotsale';
+  const vChip = (v) => chip(v.sev === 'good' ? 'good' : v.sev === 'warning' ? 'warning' : 'neutral', v.label);
+  function screenTrade(p) {
+    const evals = D.PROMOS.map(D.promoEval);
+    const e = evals.find((x) => x.pr.id === promoSel);
+    const finding = `${vChip(e.verdict)} <b>${esc(e.pr.name)} en ${esc(e.chain.short)}</b> (${e.label}). ${esc(e.verdict.why)}`;
+    const sel = `<div class="seg" role="tablist" aria-label="Campaña">${evals.map((x) => `<button type="button" role="tab" aria-selected="${x.pr.id === promoSel}" data-promo="${x.pr.id}"><b>${esc(x.pr.name)}</b><span>${esc(x.chain.short)} · ${x.label}</span></button>`).join('')}</div>`;
+    const html = head(p, finding, sel + freshness([e.chain.id])) + `
+      <div class="tiles">
+        ${tile({ label: 'Cambio en Sell-Out', value: signed(e.liftSO, 0) + '%', sub: 'Campaña vs base de igual duración', info: 'Sell-Out de las semanas de campaña ÷ (promedio semanal de las 4 semanas previas × duración) − 1.' })}
+        ${tile({ label: 'Cambio en Sell-In', value: signed(e.liftSI, 0) + '%', sub: 'Lo que la cadena compró', info: 'Mismo cálculo con el Sell-In facturado en SAP.' })}
+        ${tile({ label: 'Venta incremental', value: MXN(e.incrV), sub: `${K(e.incr)} piezas sobre la base · precio neto`, info: 'Sell-Out de la campaña menos la base, valuado a precio neto.' })}
+        ${tile({ label: 'Después de la campaña', value: signed(e.postLift, 0) + '%', sub: e.stPost == null ? `Sell-Out 2 semanas después · ${esc(e.chain.short)} no hizo pedidos` : `Sell-Out 2 semanas después · sell-through ${P(e.stPost, 0)}`, info: 'Si el Sell-Out se mantiene arriba de la base, el aumento fue de consumo real y no solo de inventario.' })}
+      </div>
+      ${card('Sell-Out y Sell-In alrededor de la campaña', `${esc(e.chain.name)} · piezas por semana${e.pr.cats ? ' · ' + e.pr.cats.join(', ') : ''}`, legend([['s-si', 'Sell-In', 'line'], ['s-so', 'Sell-Out', 'line'], ['b-camp', 'Campaña', 'box'], ['b-base', 'Base (4 semanas previas)', 'box']]) + '<div class="chart" id="c-promo"></div>', { src: 'gold.fact_sell_in · gold.fact_sell_out' })}
+      ${card(`Las ${evals.length} campañas con la misma regla`, 'Elevó el consumo: Sell-Out +15% y se sostiene · Solo llenó el canal: Sell-In +50% sin que suba el Sell-Out', table(
+        [{ t: 'Campaña' }, { t: 'Cadena' }, { t: 'Semanas' }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-In', num: 1 }, { t: 'Después', num: 1 }, { t: 'Venta incremental', num: 1 }, { t: 'Veredicto' }],
+        evals.map((x) => `<tr class="${x.pr.id === promoSel ? 'hl' : ''}"><td><b>${esc(x.pr.name)}</b></td><td>${esc(x.chain.short)}</td><td>${x.label}</td><td class="num">${signed(x.liftSO, 0)}%</td><td class="num">${signed(x.liftSI, 0)}%</td><td class="num">${signed(x.postLift, 0)}%</td><td class="num">${MXN(x.incrV)}</td><td>${vChip(x.verdict)}</td></tr>`)), { src: 'gold.fact_* · calendario de campañas' })}`;
+    const after = () => {
+      const w = e.win;
+      lineChart($('#c-promo'), {
+        aria: 'Sell-Out y Sell-In alrededor de la campaña', labels: w.map(wlab), h: 280,
+        bands: [{ from: w.indexOf(e.baseW[0]), to: w.indexOf(e.baseW[e.baseW.length - 1]), cls: 'b-base', label: 'Base' }, { from: w.indexOf(e.campW[0]), to: w.indexOf(e.campW[e.campW.length - 1]), cls: 'b-camp', label: e.pr.name }],
+        series: [{ name: 'Sell-In', cls: 's-si', values: e.siSeries }, { name: 'Sell-Out', cls: 's-so', values: e.soSeries }],
+        tip: (i) => tipRows(`${wlab(w[i])} · ${D.WEEKS[w[i]].range}`, [['s-si', 'Sell-In', e.siSeries[i] ? N(e.siSeries[i]) + ' pzas' : 'sin pedido'], ['s-so', 'Sell-Out', N(e.soSeries[i]) + ' pzas']]),
+      });
+    };
+    return { html, after };
+  }
+
+  // ---- 6 · Salud del dato ----
+  function screenTi(p) {
+    const H = D.HEALTH;
+    const onTime = H.filter((h) => h.chain.delayDays <= 2).length;
+    const totalQ = D.sum(H.map((h) => h.quarantine));
+    const lc = H.find((h) => h.chain.delayDays > 2);
+    const so13 = Object.fromEntries(D.CHAINS.map((c) => [c.id, D.kpis([c.id], null, D.lastWeeks(13)).soV]));
+    const homW = D.sum(H.map((h) => h.homologated * so13[h.chain.id])) / D.sum(Object.values(so13));
+    const finding = lc
+      ? `<b>${esc(lc.chain.short)} no ha entregado desde el ${lc.chain.lastCutLabel}</b> (${lc.chain.delayDays} días de retraso) y tiene ${lc.quarantine} registros en cuarentena: solo el <b>${P(lc.homologated, 0)}</b> de su Sell-Out llega homologado a los tableros. HEB entregó un lote de inventario incompleto (regla C05).`
+      : 'Todas las cadenas entregaron a tiempo.';
+    const pending = D.QUAR.filter((q) => q.status === 'pendiente');
+    const html = head(p, finding, `<div class="rls soft">${icon('lock')}<div>Perfil técnico: ve las cargas, la calidad y la cuarentena. <b>No tiene acceso a los tableros comerciales</b> (roles del espacio de trabajo en Fabric).</div></div>`) + `
+      <div class="pipe" aria-label="Estado del pipeline de hoy">${D.PIPELINE.map((s, i) => `${i ? `<span class="pipe-arrow">${icon('arrow')}</span>` : ''}<div class="stage st-${s.sev}"><div class="stage-top">${s.sev === 'good' ? icon('check') : icon('alert')}<b>${esc(s.name)}</b></div><span>${esc(s.sub)}</span><span class="stage-n">${esc(s.note)} · ${s.time}</span></div>`).join('')}</div>
+      <div class="tiles">
+        ${tile({ label: 'Cadenas al día', value: `${onTime} <small>de ${H.length}</small>`, sub: 'Entregaron en el plazo esperado', sev: onTime === H.length ? 'good' : 'critical', sevText: onTime === H.length ? 'Todas a tiempo' : `${H.length - onTime} con retraso` })}
+        ${tile({ label: 'Sell-Out homologado', value: P(homW), sub: 'Ponderado por la venta de cada cadena', sev: homW >= 99 ? 'good' : 'warning' })}
+        ${tile({ label: 'Registros en cuarentena', value: String(totalQ), sub: 'Esperan homologación en Silver', sev: totalQ ? 'warning' : 'good', sevText: totalQ ? 'Revisar cola' : 'Cola vacía' })}
+        ${tile({ label: 'Cuadre Sell-In vs SAP', value: '0.02%', sub: 'Tolerancia: 0.1% (regla C06)', sev: 'good', sevText: 'Cuadra' })}
+      </div>
+      ${card('Entregas por cadena', 'Sell-Out e inventario que manda el integrador · lote de hoy', table(
+        [{ t: 'Cadena' }, { t: 'Frecuencia' }, { t: 'Último corte' }, { t: 'Retraso', num: 1 }, { t: 'Registros del lote', num: 1 }, { t: 'vs promedio', num: 1 }, { t: '% homologado', num: 1 }, { t: 'Cuarentena', num: 1 }, { t: 'Estado' }],
+        H.map((h) => {
+          const late = h.chain.delayDays > 2, volBad = h.vol != null && Math.abs(h.vol) > 30;
+          const sev = late || volBad ? 'critical' : h.quarantine ? 'warning' : 'good';
+          const txt = late ? 'Sin entrega' : volBad ? 'Lote incompleto' : h.quarantine ? 'Cuarentena' : 'Al día';
+          return `<tr class="${sev === 'critical' ? 'hl' : ''}"><td><b>${esc(h.chain.name)}</b></td><td>${h.chain.freq}</td><td>${h.chain.lastCutLabel}</td><td class="num">${h.chain.delayDays > 0 ? h.chain.delayDays + ' días' : '—'}</td><td class="num">${h.rows == null ? 'sin lote' : N(h.rows)}</td><td class="num">${h.vol == null ? '—' : signed(h.vol, 0) + '%'}</td><td class="num">${P(h.homologated, 1)}</td><td class="num">${h.quarantine ? `${h.quarantine} · ${h.oldest} ${h.oldest === 1 ? 'día' : 'días'}` : '0'}</td><td>${chip(sev, txt)}</td></tr>`;
+        })), { src: 'Bitácora de cargas · Data Factory' })}
+      ${card('Cola de homologación', `${pending.length} pendientes en pantalla de ${totalQ} registros en cuarentena · los más antiguos primero · aprueba uno para ver cómo cambian las cifras`, `<ul class="queue" id="queue">${D.QUAR.map(qItem).join('')}</ul><p class="note">Al aprobar, el código de la cadena queda ligado al GTIN y al material SAP en silver.map_producto_cadena, y el registro pasa a Silver y Gold.</p>`, { src: 'silver.cuarentena · ai.similarity' })}
+      ${card('Reglas de calidad', 'Última carga · se ejecutan en la capa Silver', table(
+        [{ t: 'Regla' }, { t: 'Qué revisa' }, { t: 'Registros', num: 1 }, { t: 'Resultado' }],
+        D.RULES_DQ.map((r) => `<tr><td><b class="mono">${r.id}</b> ${esc(r.name)}</td><td>${esc(r.check)}</td><td class="num">${r.id === 'C06' ? '—' : N(r.n)}</td><td>${chip(r.sev, r.action)}</td></tr>`)), { src: 'Notebook de calidad · Silver' })}`;
+    return { html, after: () => {} };
+  }
+  function qItem(q) {
+    const pr = q.prod ? D.prodById[q.prod] : null;
+    const done = q.status !== 'pendiente';
+    return `<li class="q ${done ? 'done' : ''}" data-q="${q.id}">
+      <div class="q-main"><span class="q-chain">${esc(D.chainById[q.chain].short)}</span><span class="mono">${esc(q.code)}</span><p class="q-desc">“${esc(q.desc)}”</p>
+      <p class="q-match">${pr ? `${esc(q.method)} → <b>${esc(pr.brand)} ${esc(pr.name)}</b> <span class="mono">${pr.sap} · GTIN ${pr.gtin}</span> · similitud ${q.sim}%` : 'Sin coincidencia en el catálogo de L’Oréal'}</p></div>
+      <div class="q-act">${done ? chip(q.status === 'aprobado' ? 'good' : 'neutral', q.status === 'aprobado' ? 'Aprobado' : 'Enviado a maestro de datos') : pr
+        ? `<button type="button" class="btn" data-approve="${q.id}">${icon('check')}Aprobar</button><button type="button" class="btn ghost" data-reject="${q.id}">Rechazar</button>`
+        : `<button type="button" class="btn ghost" data-reject="${q.id}">Enviar a maestro de datos</button>`}</div>
+    </li>`;
+  }
+  function resolveQ(id, status) {
+    const q = D.QUAR.find((x) => x.id === id); if (!q || q.status !== 'pendiente') return;
+    q.status = status;
+    const h = D.HEALTH.find((x) => x.chain.id === q.chain);
+    const before = h.quarantine;
+    h.quarantine = Math.max(0, h.quarantine - 1);
+    if (status === 'aprobado') h.homologated = Math.min(100, h.homologated + (100 - h.homologated) / Math.max(1, before));
+    if (!h.quarantine) h.oldest = 0;
+    render(current, false);
+    toast(status === 'aprobado' ? `Homologado: ${q.code} quedó ligado a ${D.prodById[q.prod].sap}` : `${q.code} enviado al equipo de datos maestros`);
+  }
+
+  // ======================= MARCO DE LA APP =======================
+  const SCREENS = { finanzas: screenFinanzas, kam: screenKam, demand: screenDemand, comercial: screenComercial, trade: screenTrade, ti: screenTi };
+  let current = 'finanzas';
+  function renderHero() {
+    const A = D.ASSUME;
+    $('#hero-facts').innerHTML = [
+      ['Venta anual de referencia', `€${N(A.annualEUR / 1e6)} M`, `≈ ${MXN(A.annualMXN)} MXN`],
+      ['Conectado en la Etapa 1', P(A.connected * 100, 1), `7 cadenas · ≈ ${MXN(A.connected * A.annualMXN)} al año`],
+      ['Datos al', D.fmtDateY(D.CUT), 'Modelo actualizado a las 04:20'],
+    ].map(([k, v, s]) => `<div><dt>${k}</dt><dd>${v}<span>${s}</span></dd></div>`).join('');
+    const top = D.TOP, restSkus = D.sum(D.PRODUCTS.filter((x) => !x.top).map((x) => x.skus));
+    $('#assume').innerHTML = [
+      `Venta anual de L’Oréal México de €1,000 M (dato que compartió el profesor), convertida a 20 pesos por euro: ≈ ${MXN(A.annualMXN)}. Como referencia, el euro cerró en 19.83 pesos el 6 de agosto de 2026.`,
+      `Las 7 cadenas de la Etapa 1 representan ${P(A.connected * 100, 1)} de esa venta (≈ ${MXN(A.connected * A.annualMXN)} al año): ${P(A.channels[0].share * 100, 1)} autoservicio y ${P(A.channels[1].share * 100, 1)} comercio electrónico. La mezcla por canal es un supuesto del equipo.`,
+      `Sell-In y Sell-Out se valúan al precio neto de L’Oréal, ${P(A.netOfPvp * 100, 0)} del precio al público, para que ambos sean comparables.`,
+      `${top.length} SKUs prioritarios con detalle por tienda (≈ ${P(D.sum(top.map((x) => x.share)) * 100, 0)} del valor) y el resto del portafolio (≈ ${N(restSkus)} SKUs) agregado por marca y categoría; ${N(D.STORES.length)} tiendas de las 5 cadenas con tienda física.`,
+      `Crecimiento de ${P(A.growth * 100, 0)} anual y estacionalidad: Buen Fin, Navidad, cuesta de enero, temporada de sol, Día de las Madres y Hot Sale.`,
+    ].map((t) => `<li>${t}</li>`).join('');
+  }
+  function renderUsers() {
+    $('#users').innerHTML = PERSONAS.map((p, i) => `<button type="button" class="user" role="tab" aria-selected="${p.id === current}" data-user="${p.id}">
+      <span class="av">${p.initials}</span><span class="u-txt"><b>${esc(p.name)}</b><span>${esc(p.role)}</span></span><span class="u-n" title="Tablero ${p.board}">${i + 1}</span>
+    </button>`).join('');
+  }
+  function renderSession(p) {
+    const al = alertsFor(p.id);
+    $('#session').innerHTML = `<div class="who"><span class="av big">${p.initials}</span><div><p class="who-l">Sesión iniciada</p><p class="who-n">${esc(p.name)}</p><p class="who-r">${esc(p.role)} · ${esc(p.area)}</p></div></div>
+      <dl class="facts">
+        <div><dt>Tablero</dt><dd>${p.board} · ${esc(p.boardName)}</dd></div>
+        <div><dt>Qué ve</dt><dd>${esc(p.scope)}</dd></div>
+        <div><dt>Permisos</dt><dd class="${p.locked ? 'lock' : ''}">${p.locked ? icon('lock') : ''}${esc(p.rls)}</dd></div>
+        <div><dt>Alertas para ti</dt><dd>${al.length ? `${icon('bell')}${al.length > 2 ? al.length + ' activas hoy' : al.length + ' · ' + esc(al.map((a) => a.rule.name).filter((v, i, s) => s.indexOf(v) === i).join(', '))}` : 'Ninguna hoy'}</dd></div>
+      </dl>`;
+  }
+  function renderFilters(pid) {
+    const el = $('#filters');
+    if (pid === 'trade' || pid === 'ti') {
+      el.innerHTML = `<p class="fl-note">${icon('filter')}${pid === 'trade' ? 'Cada campaña trae su propia cadena y semanas: en este tablero no aplican los filtros globales.' : 'Salud del dato revisa las cargas completas de las 7 cadenas: aquí no aplican los filtros comerciales.'}</p>`;
+      return;
+    }
+    const opt = (v, t, cur) => `<option value="${esc(v)}"${String(v) === String(cur) ? ' selected' : ''}>${esc(t)}</option>`;
+    const sel = (id, label, opts) => `<label class="fl"><span class="fl-l">${label}</span><select id="${id}">${opts}</select></label>`;
+    const lock = (label, text) => `<span class="fl locked"><span class="fl-l">${label}</span><b>${icon('lock')}${esc(text)}</b></span>`;
+    const period = pid === 'comercial' ? lock('Periodo', 'Últimos 28 días') : sel('f-period', 'Periodo', [4, 13, 26, 52].map((n) => opt(n, `Últimas ${n} semanas`, FIL.period)).join(''));
+    let chain;
+    if (pid === 'kam') chain = lock('Cadena', 'Walmart de México');
+    else {
+      const list = pid === 'comercial' ? physical : allChains, cur = list.includes(FIL.chain) ? FIL.chain : 'all';
+      chain = sel('f-chain', 'Cadena', opt('all', pid === 'comercial' ? 'Las 5 con tienda' : 'Las 7 cadenas', cur) + list.map((id) => opt(id, D.chainById[id].name, cur)).join(''));
+    }
+    const div = sel('f-div', 'División', opt('all', 'Todas', FIL.div) + Object.entries(D.DIVS).map(([k, v]) => opt(k, v, FIL.div)).join(''));
+    const cat = sel('f-cat', 'Categoría', opt('all', 'Todas', FIL.cat) + catsForDiv(FIL.div).map((c) => opt(c, c, FIL.cat)).join(''));
+    const dirty = FIL.period !== FIL0.period || FIL.div !== FIL0.div || FIL.cat !== FIL0.cat || FIL.chain !== FIL0.chain;
+    el.innerHTML = `<span class="fl-h">${icon('filter')}Filtros</span>${period}${chain}${div}${cat}${dirty ? '<button type="button" class="btn ghost sm" id="f-reset">Limpiar filtros</button>' : ''}<span class="fl-note">Se conservan al cambiar de usuario</span>`;
+  }
+  function render(pid, animate = true) {
+    current = pid;
+    const p = personaById[pid];
+    document.body.dataset.persona = pid;
+    renderUsers(); renderSession(p); renderFilters(pid); resetCharts(); hideTip();
+    const { html, after } = SCREENS[pid](p);
+    const main = $('#screen');
+    const y = window.scrollY;
+    main.innerHTML = html;
+    if (animate) { main.classList.remove('enter'); void main.offsetWidth; main.classList.add('enter'); }
+    after();
+    if (!animate) window.scrollTo(0, y);
+  }
+  function go(pid, fromUser) {
+    if (!SCREENS[pid] || pid === current) return;
+    render(pid, true);
+    try { history.replaceState(null, '', '#' + pid); } catch (e) { /* sin historial */ }
+    const p = personaById[pid];
+    toast(`Sesión: ${p.name} · ${p.role}`);
+    if (!fromUser) $('#users').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }
+  let toastT;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2600); }
+
+  $('#filters').addEventListener('change', (ev) => {
+    const t = ev.target; if (!t.matches('select')) return;
+    const key = t.id.slice(2);
+    FIL[key] = key === 'period' ? Number(t.value) : t.value;
+    if (key === 'div' && FIL.cat !== 'all' && !catsForDiv(FIL.div).includes(FIL.cat)) FIL.cat = 'all';
+    render(current, false);
+    const again = $('#' + t.id); if (again) again.focus();
+  });
+  document.addEventListener('click', (ev) => {
+    const u = ev.target.closest('[data-user]'); if (u) { go(u.dataset.user, true); return; }
+    const g = ev.target.closest('[data-go]'); if (g) { go(g.dataset.go, false); return; }
+    const pr = ev.target.closest('[data-promo]'); if (pr) { promoSel = pr.dataset.promo; render('trade', false); return; }
+    const ap = ev.target.closest('[data-approve]'); if (ap) { resolveQ(ap.dataset.approve, 'aprobado'); return; }
+    const rj = ev.target.closest('[data-reject]'); if (rj) { resolveQ(rj.dataset.reject, 'rechazado'); return; }
+    if (ev.target.closest('#f-reset')) { Object.assign(FIL, FIL0); render(current, false); toast('Filtros restablecidos: últimas 13 semanas, todo el portafolio'); return; }
+    if (ev.target.closest('[data-assume]')) { const d = $('#supuestos'); d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  });
+  document.addEventListener('pointerover', (ev) => { const t = ev.target.closest('[data-tip]'); if (t) showTip(ev, `<div class="tt-p">${esc(t.dataset.tip)}</div>`); });
+  document.addEventListener('pointerout', (ev) => { if (ev.target.closest('[data-tip]')) hideTip(); });
+  document.addEventListener('focusin', (ev) => { const t = ev.target.closest('[data-tip]'); if (t) { const r = t.getBoundingClientRect(); showTip({ clientX: r.right, clientY: r.bottom }, `<div class="tt-p">${esc(t.dataset.tip)}</div>`); } });
+  document.addEventListener('focusout', (ev) => { if (ev.target.closest('[data-tip]')) hideTip(); });
+  document.addEventListener('keydown', (ev) => {
+    if (ev.target.closest('input, textarea, select') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    const n = Number(ev.key); if (n >= 1 && n <= 6) go(PERSONAS[n - 1].id, true);
+  });
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  renderHero();
+  const start = (location.hash || '').replace('#', '');
+  render(SCREENS[start] ? start : 'finanzas', false);
+})();
+
+</script>
+
+</body>
+</html>
