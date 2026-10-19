@@ -14,50 +14,55 @@
 <style>
 /* Layout: banda de usuarios arriba (quién eres), franja de sesión (qué ves) y el tablero de ese usuario debajo. */
 :root {
-  --plane: #f2f2ee; --surface: #fcfcfb; --raised: #ffffff;
-  --ink: #0b0b0b; --ink-2: #52514e; --muted: #75736d; --grid: #e4e3dc; --axis: #c3c2b7; --line: rgba(11, 11, 11, .10);
-  --so: #2a78d6; --si: #eb6834; --crit-bar: #d03b3b;
+  /* identidad L'Oréal: negro, blanco, dorado (solo acentos), champaña (fondos suaves) y grafito (texto secundario) */
+  --lo-black: #000000; --lo-white: #ffffff; --lo-gold: #c09853; --lo-champagne: #e8d8b0; --lo-graphite: #4a4a4a;
+  --plane: color-mix(in srgb, var(--lo-champagne) 22%, var(--lo-white)); --surface: var(--lo-white); --raised: var(--lo-white);
+  --ink: var(--lo-black); --ink-2: var(--lo-graphite); --muted: color-mix(in srgb, var(--lo-graphite) 80%, var(--lo-white));
+  --grid: color-mix(in srgb, var(--lo-champagne) 45%, var(--lo-white)); --axis: color-mix(in srgb, var(--lo-graphite) 35%, var(--lo-white)); --line: rgba(0, 0, 0, .10);
+  --so: var(--lo-black); --si: var(--lo-gold); --crit-bar: #d03b3b;
   --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
   --good-ink: #0a6a0a; --warning-ink: #7a5000; --critical-ink: #a32222; --neutral-ink: #52514e;
-  --good-wash: rgba(12, 163, 12, .10); --warning-wash: rgba(250, 178, 25, .18); --critical-wash: rgba(208, 59, 59, .10); --neutral-wash: rgba(11, 11, 11, .06);
-  --sel: #10203a; --sel-ink: #f6f7fb; --sel-soft: #e7ebf3;
-  --div-neg: #e34948; --div-pos: #2a78d6; --div-mid: #efeee9;
-  --camp: rgba(42, 120, 214, .11); --base: rgba(11, 11, 11, .05);
-  --land: #e9e8e2; --land-edge: #cfcdc4;
-  --shadow: 0 1px 2px rgba(11, 11, 11, .05);
-  --hero-bg: #0f1b30; --hero-deep: #0a1322; --hero-ink: #f4f6fa; --hero-muted: rgba(244, 246, 250, .72); --hero-line: rgba(255, 255, 255, .14);
-  --e1: #1c5cab; --e2: #3987e5; --e3: #86b6ef; --e1-ink: #ffffff; --e2-ink: #0b1a30; --e3-ink: #0b1a30;
+  --good-wash: rgba(12, 163, 12, .10); --warning-wash: rgba(250, 178, 25, .18); --critical-wash: rgba(208, 59, 59, .10); --neutral-wash: rgba(0, 0, 0, .06);
+  --sel: var(--lo-black); --sel-ink: var(--lo-white); --sel-edge: var(--lo-black); --sel-soft: var(--lo-champagne);
+  --div-neg: #e34948; --div-pos: var(--lo-gold); --div-mid: color-mix(in srgb, var(--lo-champagne) 30%, var(--lo-white)); --heat-ink: var(--lo-black);
+  --camp: rgba(192, 152, 83, .16); --base: rgba(0, 0, 0, .05);
+  --land: color-mix(in srgb, var(--lo-champagne) 40%, var(--lo-white)); --land-edge: color-mix(in srgb, var(--lo-champagne) 70%, var(--lo-graphite));
+  --shadow: 0 1px 2px rgba(0, 0, 0, .05);
+  --hero-bg: var(--lo-black); --hero-deep: var(--lo-black); --hero-ink: var(--lo-white); --hero-muted: rgba(255, 255, 255, .74); --hero-line: rgba(192, 152, 83, .45); --hero-accent: var(--lo-gold);
+  --e1: var(--lo-black); --e2: var(--lo-gold); --e3: var(--lo-champagne); --e1-ink: var(--lo-white); --e2-ink: var(--lo-black); --e3-ink: var(--lo-black);
   --font-ui: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --plane: #0e0e0d; --surface: #1a1a19; --raised: #20201e;
-    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9a988f; --grid: #2c2c2a; --axis: #45443f; --line: rgba(255, 255, 255, .10);
-    --so: #3987e5; --si: #d95926; --crit-bar: #e05252;
+    --plane: var(--lo-black); --surface: color-mix(in srgb, var(--lo-graphite) 30%, var(--lo-black)); --raised: color-mix(in srgb, var(--lo-graphite) 42%, var(--lo-black));
+    --ink: var(--lo-white); --ink-2: color-mix(in srgb, var(--lo-white) 78%, var(--lo-graphite)); --muted: color-mix(in srgb, var(--lo-white) 58%, var(--lo-graphite));
+    --grid: color-mix(in srgb, var(--lo-graphite) 50%, var(--lo-black)); --axis: color-mix(in srgb, var(--lo-graphite) 95%, var(--lo-black)); --line: rgba(255, 255, 255, .12);
+    --so: color-mix(in srgb, var(--lo-white) 88%, var(--lo-graphite)); --si: var(--lo-gold); --crit-bar: #e05252;
     --good-ink: #4fd34f; --warning-ink: #fab219; --critical-ink: #f28383; --neutral-ink: #c3c2b7;
     --good-wash: rgba(12, 163, 12, .16); --warning-wash: rgba(250, 178, 25, .16); --critical-wash: rgba(208, 59, 59, .20); --neutral-wash: rgba(255, 255, 255, .07);
-    --sel: #dfe6f5; --sel-ink: #0e1626; --sel-soft: #1f2636;
-    --div-neg: #e66767; --div-pos: #3987e5; --div-mid: #33332f;
-    --camp: rgba(57, 135, 229, .16); --base: rgba(255, 255, 255, .06);
-    --land: #262624; --land-edge: #3a3a36;
-    --hero-bg: #111d33; --hero-deep: #0a1322;
-    --e1: #86b6ef; --e2: #3987e5; --e3: #256abf; --e1-ink: #0b1a30; --e2-ink: #0b1a30; --e3-ink: #ffffff;
+    --sel: var(--lo-black); --sel-ink: var(--lo-white); --sel-edge: var(--lo-gold); --sel-soft: color-mix(in srgb, var(--lo-gold) 24%, var(--lo-black));
+    --div-neg: #e66767; --div-pos: var(--lo-gold); --div-mid: color-mix(in srgb, var(--lo-graphite) 55%, var(--lo-black)); --heat-ink: var(--lo-black);
+    --camp: rgba(192, 152, 83, .20); --base: rgba(255, 255, 255, .06);
+    --land: color-mix(in srgb, var(--lo-graphite) 40%, var(--lo-black)); --land-edge: color-mix(in srgb, var(--lo-graphite) 80%, var(--lo-black));
+    --hero-bg: var(--lo-black); --hero-deep: var(--lo-black);
+    --e1: var(--lo-champagne); --e2: var(--lo-gold); --e3: var(--lo-graphite); --e1-ink: var(--lo-black); --e2-ink: var(--lo-black); --e3-ink: var(--lo-white);
     --shadow: none; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --plane: #0e0e0d; --surface: #1a1a19; --raised: #20201e;
-  --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9a988f; --grid: #2c2c2a; --axis: #45443f; --line: rgba(255, 255, 255, .10);
-  --so: #3987e5; --si: #d95926; --crit-bar: #e05252;
+  --plane: var(--lo-black); --surface: color-mix(in srgb, var(--lo-graphite) 30%, var(--lo-black)); --raised: color-mix(in srgb, var(--lo-graphite) 42%, var(--lo-black));
+  --ink: var(--lo-white); --ink-2: color-mix(in srgb, var(--lo-white) 78%, var(--lo-graphite)); --muted: color-mix(in srgb, var(--lo-white) 58%, var(--lo-graphite));
+  --grid: color-mix(in srgb, var(--lo-graphite) 50%, var(--lo-black)); --axis: color-mix(in srgb, var(--lo-graphite) 95%, var(--lo-black)); --line: rgba(255, 255, 255, .12);
+  --so: color-mix(in srgb, var(--lo-white) 88%, var(--lo-graphite)); --si: var(--lo-gold); --crit-bar: #e05252;
   --good-ink: #4fd34f; --warning-ink: #fab219; --critical-ink: #f28383; --neutral-ink: #c3c2b7;
   --good-wash: rgba(12, 163, 12, .16); --warning-wash: rgba(250, 178, 25, .16); --critical-wash: rgba(208, 59, 59, .20); --neutral-wash: rgba(255, 255, 255, .07);
-  --sel: #dfe6f5; --sel-ink: #0e1626; --sel-soft: #1f2636;
-  --div-neg: #e66767; --div-pos: #3987e5; --div-mid: #33332f;
-  --camp: rgba(57, 135, 229, .16); --base: rgba(255, 255, 255, .06);
-  --land: #262624; --land-edge: #3a3a36;
-  --hero-bg: #111d33; --hero-deep: #0a1322;
-  --e1: #86b6ef; --e2: #3987e5; --e3: #256abf; --e1-ink: #0b1a30; --e2-ink: #0b1a30; --e3-ink: #ffffff;
+  --sel: var(--lo-black); --sel-ink: var(--lo-white); --sel-edge: var(--lo-gold); --sel-soft: color-mix(in srgb, var(--lo-gold) 24%, var(--lo-black));
+  --div-neg: #e66767; --div-pos: var(--lo-gold); --div-mid: color-mix(in srgb, var(--lo-graphite) 55%, var(--lo-black)); --heat-ink: var(--lo-black);
+  --camp: rgba(192, 152, 83, .20); --base: rgba(255, 255, 255, .06);
+  --land: color-mix(in srgb, var(--lo-graphite) 40%, var(--lo-black)); --land-edge: color-mix(in srgb, var(--lo-graphite) 80%, var(--lo-black));
+  --hero-bg: var(--lo-black); --hero-deep: var(--lo-black);
+  --e1: var(--lo-champagne); --e2: var(--lo-gold); --e3: var(--lo-graphite); --e1-ink: var(--lo-black); --e2-ink: var(--lo-black); --e3-ink: var(--lo-white);
   --shadow: none; color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -69,16 +74,19 @@ small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 
 .mono { font-family: var(--font-mono); font-size: 12px; }
 .ic { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-/* franja de prototipo + encabezado de la propuesta (azul marino en ambos temas) */
+/* franja de prototipo + encabezado de la propuesta (negro L'Oréal con detalles en dorado, en ambos temas) */
 .ribbon { background: var(--hero-deep); color: var(--hero-muted); font-size: 12.5px; border-bottom: 1px solid var(--hero-line); }
 .ribbon .wrap { display: flex; flex-wrap: wrap; gap: 4px 16px; justify-content: space-between; align-items: center; padding-block: 7px; }
 .ribbon b { color: var(--hero-ink); }
 .rb-link { appearance: none; background: none; border: 0; padding: 0; color: var(--hero-ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .rb-link:focus-visible { outline: 2px solid var(--hero-ink); outline-offset: 2px; border-radius: 3px; }
-.hero { background: var(--hero-bg); color: var(--hero-ink); }
+.hero { background: var(--hero-bg); color: var(--hero-ink); border-bottom: 3px solid var(--hero-accent); }
 .hero-in { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 22px 40px; padding-block: 30px 32px; }
 .hero-l { min-width: 0; flex: 1 1 420px; }
-.hero-k { margin: 0 0 6px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--hero-muted); font-weight: 600; }
+.hero-k { margin: 0 0 6px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--hero-accent); font-weight: 600; }
+.hero-brand { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin: 0 0 14px; }
+.hero-brand .hero-k { margin: 0; padding-right: 18px; border-right: 1px solid var(--hero-line); }
+.hero-logo { display: block; height: 48px; width: auto; max-width: 100%; }
 .hero-t { margin: 0; font-size: clamp(42px, 6.6vw, 76px); line-height: .98; letter-spacing: -.03em; font-weight: 700; }
 .hero-s { margin: 14px 0 0; font-size: 15px; line-height: 1.5; color: var(--hero-muted); max-width: 56ch; }
 .hero-f { display: grid; grid-template-columns: repeat(3, auto); margin: 0; }
@@ -98,7 +106,11 @@ small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 
 .fl.locked b { display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; background: var(--warning-wash); border: 1px solid transparent; }
 .fl.locked .ic { color: var(--warning-ink); }
 .fl-note { margin: 0 0 0 auto; align-self: center; display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--muted); }
-.filters > .fl-note:only-child { margin-left: 0; color: var(--ink-2); }
+.filters > .fl-note:first-child { margin-left: 0; color: var(--ink-2); }
+.exp-btn { margin-left: auto; align-self: center; }
+.filters > .fl-note:not(:first-child) + .exp-btn { margin-left: 0; }
+.exp-btn kbd { color: inherit; border-color: currentColor; opacity: .7; }
+.btn.ghost.exp-btn[aria-pressed="true"] { background: var(--sel); color: var(--sel-ink); border-color: var(--sel-edge); }
 .btn.sm { padding: 6px 10px; font-size: 12.5px; }
 
 /* usuarios */
@@ -108,7 +120,7 @@ small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 
 .user { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 12px; padding: 10px 10px 10px 10px; display: flex; gap: 10px; align-items: center; text-align: left; cursor: pointer; font: inherit; min-width: 0; position: relative; transition: background .15s, border-color .15s, transform .15s; }
 .user:hover { border-color: var(--axis); }
 .user:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
-.user[aria-selected="true"] { background: var(--sel); color: var(--sel-ink); border-color: var(--sel); }
+.user[aria-selected="true"] { background: var(--sel); color: var(--sel-ink); border-color: var(--sel-edge); }
 .av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: var(--sel-soft); color: var(--ink); flex: none; letter-spacing: .02em; }
 .user[aria-selected="true"] .av { background: var(--sel-ink); color: var(--sel); }
 .u-txt { display: flex; flex-direction: column; min-width: 0; }
@@ -119,7 +131,7 @@ small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 
 /* sesión */
 .session { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; gap: 14px 28px; align-items: center; box-shadow: var(--shadow); }
 .who { display: flex; gap: 12px; align-items: center; }
-.av.big { width: 46px; height: 46px; font-size: 16px; background: var(--sel); color: var(--sel-ink); }
+.av.big { width: 46px; height: 46px; font-size: 16px; background: var(--sel); color: var(--sel-ink); box-shadow: 0 0 0 1px var(--sel-edge); }
 .who p { margin: 0; }
 .who-l { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
 .who-n { font-size: 18px; font-weight: 700; }
@@ -139,7 +151,7 @@ small { font-size: .5em; font-weight: 500; color: var(--ink-2); letter-spacing: 
 .eyebrow { margin: 0; font-size: 12.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .screen-head h1 { margin: 0; font-size: clamp(24px, 3.1vw, 34px); line-height: 1.15; letter-spacing: -.015em; font-weight: 700; text-wrap: balance; max-width: 30ch; }
 .finding { display: flex; gap: 14px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; max-width: 980px; box-shadow: var(--shadow); }
-.finding-l { flex: none; font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--sel-ink); background: var(--sel); padding: 3px 8px; border-radius: 6px; }
+.finding-l { flex: none; font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--sel-ink); background: var(--sel); padding: 3px 8px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--sel-edge); }
 .finding p { margin: 0; font-size: 16px; line-height: 1.5; }
 .rls { display: flex; gap: 10px; align-items: flex-start; background: var(--warning-wash); color: var(--ink); border-radius: 10px; padding: 10px 14px; font-size: 14px; max-width: 980px; }
 .rls .ic { margin-top: 3px; color: var(--warning-ink); }
@@ -314,7 +326,7 @@ svg text { font-family: var(--font-ui); }
 .q-desc { margin: 2px 0; font-family: var(--font-mono); font-size: 12.5px; overflow-wrap: anywhere; }
 .q-match { margin: 0; font-size: 13px; color: var(--ink-2); }
 .q-act { display: flex; gap: 6px; flex-wrap: wrap; }
-.btn { appearance: none; border: 1px solid var(--sel); background: var(--sel); color: var(--sel-ink); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.btn { appearance: none; border: 1px solid var(--sel-edge); background: var(--sel); color: var(--sel-ink); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--axis); }
 .btn:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; }
 
@@ -326,7 +338,7 @@ svg text { font-family: var(--font-ui); }
 .tt-r b { font-variant-numeric: tabular-nums; }
 .tt-r .sw { width: 10px; height: 10px; }
 .tt-p { margin: 0; line-height: 1.45; }
-.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--sel); color: var(--sel-ink); padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 28px rgba(0, 0, 0, .22); max-width: calc(100% - 32px); }
+.toast { position: fixed; z-index: 60; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--sel); color: var(--sel-ink); padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; border: 1px solid var(--sel-edge); box-shadow: 0 8px 28px rgba(0, 0, 0, .22); max-width: calc(100% - 32px); }
 .toast.show { animation: toast .3s ease-out; }
 @keyframes toast { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
@@ -337,6 +349,15 @@ footer.foot .wrap { padding-block: 16px 28px; }
 .assume summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--ink); }
 .assume summary:focus-visible { outline: 2px solid var(--so); outline-offset: 2px; border-radius: 4px; }
 .assume ul { margin: 10px 0 2px; padding-left: 18px; display: grid; gap: 6px; max-width: 920px; font-size: 13.5px; color: var(--ink); }
+/* modo explicación (tecla E): subtítulos del glosario debajo de cada término técnico */
+.exp { display: none; margin: 2px 0 0; font-size: 12px; line-height: 1.35; font-weight: 400; color: var(--muted); letter-spacing: 0; text-transform: none; font-style: normal; }
+.exp b { font-weight: 600; color: var(--ink-2); }
+body.explain-on .exp { display: block; }
+.tbl th .exp { white-space: normal; min-width: 14ch; max-width: 26ch; }
+.tbl th.num .exp { margin-left: auto; }
+.hero .exp, .hero .exp b { color: var(--hero-muted); }
+.hero-f .exp { max-width: 26ch; margin-top: 4px; }
+.pipe-exp { margin: 0 0 8px; }
 kbd { font-family: var(--font-mono); font-size: 11.5px; border: 1px solid var(--axis); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
 
 @media (max-width: 1080px) {
@@ -361,6 +382,9 @@ kbd { font-family: var(--font-mono); font-size: 11.5px; border: 1px solid var(--
   .fl { flex: 1 1 calc(50% - 12px); }
   .fl select { width: 100%; }
   .fl-note { margin-left: 0; }
+  .exp-btn { margin-left: 0; }
+  .hero-logo { height: 40px; }
+  .hero-brand .hero-k { border-right: 0; padding-right: 0; }
   .spark { display: none; }
   .finding { flex-direction: column; gap: 8px; }
 }
@@ -375,12 +399,12 @@ kbd { font-family: var(--font-mono); font-size: 11.5px; border: 1px solid var(--
 <body>
 
 
-<div class="ribbon"><div class="wrap"><span><b>Prototipo académico TC2003B</b> · Datos sintéticos a escala de una venta anual de €1,000 M; no son cifras reales de L’Oréal México ni de las cadenas.</span><button type="button" class="rb-link" data-assume>Ver supuestos</button></div></div>
+<div class="ribbon"><div class="wrap"><span><b>Prototipo académico TC2003B · datos sintéticos</b> · Propuesta del equipo para L’Oréal México, no es un sistema oficial de L’Oréal. Cifras a escala de una venta anual de €1,000 M; no son datos reales de L’Oréal ni de las cadenas.</span><button type="button" class="rb-link" data-assume>Ver supuestos</button></div></div>
 
 <header class="hero">
   <div class="wrap hero-in">
     <div class="hero-l">
-      <p class="hero-k">Propuesta para</p>
+      <div class="hero-brand"><p class="hero-k">Propuesta para</p><img class="hero-logo" src="loreal-logo-blanco.png" alt="L'Oréal" width="292" height="56"></div>
       <h1 class="hero-t">L’Oréal México</h1>
       <p class="hero-s">Data link Sell-In / Sell-Out sobre Microsoft Fabric y Power BI: un solo modelo, seis tableros, uno por cada área. Equipo TC2003B · Tec de Monterrey.</p>
     </div>
@@ -400,7 +424,7 @@ kbd { font-family: var(--font-mono); font-size: 11.5px; border: 1px solid var(--
   <details class="assume" id="supuestos"><summary>Supuestos del prototipo</summary><ul id="assume"></ul></details>
   <div class="foot-row">
     <span>Seis tableros sobre un solo modelo semántico: las mismas definiciones de indicadores para todos los usuarios.</span>
-    <span>Teclas <kbd>1</kbd>–<kbd>6</kbd> cambian de usuario</span>
+    <span>Teclas <kbd>1</kbd>–<kbd>6</kbd> cambian de usuario · <kbd>E</kbd> modo explicación</span>
   </div>
 </div></footer>
 
@@ -928,6 +952,63 @@ if (typeof module !== 'undefined') module.exports = MODEL;
   const doiStatus = (d) => (d == null ? 'neutral' : d < 7 || d > 45 ? 'critical' : d > 35 ? 'warning' : 'good');
   const oosStatus = (o) => (o > 6 ? 'critical' : o >= 4.5 ? 'warning' : 'good');
 
+  // ---------- modo explicación (tecla E): glosario término → explicación ----------
+  const GLOSARIO = {
+    'Sell-In': 'lo que L’Oréal le vende y le factura a la cadena (sale de SAP).',
+    'Sell-Out': 'lo que la cadena le vende al consumidor final (sale del integrador).',
+    'Sell-through': 'de cada 100 piezas que compró la cadena, cuántas ya vendió al consumidor.',
+    'Brecha Sell-In − Sell-Out': 'lo que se facturó pero sigue en bodegas y anaqueles de la cadena.',
+    'Días de inventario': 'cuántos días le alcanza a la cadena el producto al ritmo de venta actual.',
+    'Rotación': 'cuántas veces se vendió el inventario completo en el periodo.',
+    'OOS': 'porcentaje de veces que un producto estuvo agotado en tienda.',
+    'Quiebre': 'un producto agotado en una tienda.',
+    'Venta perdida': 'lo que se dejó de vender porque el producto estaba agotado.',
+    'Sobreinventario': 'la cadena tiene producto para más de 45 días; le sobra.',
+    'Cobertura baja': 'el producto se acaba en menos de 7 días.',
+    'Llenado del canal': 'la cadena compró mucho más de lo que vende; el producto se queda en su bodega.',
+    'KAM': 'ejecutivo de L’Oréal responsable de una cadena, por ejemplo Walmart.',
+    'Seguridad por fila (RLS)': 'cada usuario solo ve los datos que le tocan.',
+    'CEDIS': 'centro de distribución de la cadena.',
+    'Homologación': 'traducir el código de producto de cada cadena al código de L’Oréal.',
+    'Cuarentena': 'registros que no se pudieron homologar y esperan revisión.',
+    'Conciliación': 'comparar el inventario calculado con el que reporta la cadena.',
+    'Inventario implícito': 'el inventario que debería tener la cadena según lo que compró y vendió.',
+    'GTIN': 'el código de barras universal del producto.',
+    'Material SAP': 'el código interno de L’Oréal para cada producto.',
+    'Bronze / Silver / Gold': 'capas del dato: crudo, limpio y traducido, y listo para analizar.',
+    'Modelo semántico': 'donde se guarda una sola fórmula para cada indicador.',
+    'Direct Lake': 'Power BI lee los datos directo del Lakehouse, sin copiarlos.',
+    'Activator': 'servicio que manda alertas automáticas por Teams o correo.',
+    'Pipeline': 'los pasos automáticos que cargan y limpian los datos cada día.',
+    'S&OP': 'junta mensual donde Ventas y Supply Chain acuerdan cuánto producir y enviar.',
+    'Precio neto': 'lo que L’Oréal le cobra a la cadena, sin el margen de la tienda.',
+    'Etapa 1, 2 y 3': 'las fases en que se van conectando las cadenas al sistema.',
+  };
+  // qué término reconoce cada texto (del más específico al más general)
+  const TERM_RX = [
+    [/brecha/i, 'Brecha Sell-In − Sell-Out'], [/cobertura baja|riesgo de quiebre/i, 'Cobertura baja'], [/llenado|llen[oó] el canal/i, 'Llenado del canal'],
+    [/sobreinventario|exceso/i, 'Sobreinventario'], [/venta perdida/i, 'Venta perdida'], [/impl[ií]cito/i, 'Inventario implícito'],
+    [/material sap/i, 'Material SAP'], [/conciliaci[oó]n|cuadre/i, 'Conciliación'], [/homolog/i, 'Homologación'], [/cuarentena/i, 'Cuarentena'],
+    [/sell-through/i, 'Sell-through'], [/sell-in/i, 'Sell-In'], [/sell-out/i, 'Sell-Out'], [/d[ií]as (de )?inv/i, 'Días de inventario'],
+    [/rotaci[oó]n/i, 'Rotación'], [/\bOOS\b/, 'OOS'], [/quiebre/i, 'Quiebre'], [/\bKAM\b|key account manager/i, 'KAM'],
+    [/\bRLS\b|seguridad por fila/i, 'Seguridad por fila (RLS)'], [/\bCEDIS\b/, 'CEDIS'], [/\bGTIN\b/, 'GTIN'], [/\b(Bronze|Silver|Gold)\b/, 'Bronze / Silver / Gold'],
+    [/modelo sem[aá]ntico/i, 'Modelo semántico'], [/direct lake/i, 'Direct Lake'], [/activator/i, 'Activator'], [/pipeline/i, 'Pipeline'],
+    [/S&OP/, 'S&OP'], [/precio neto/i, 'Precio neto'], [/\betapa\b/i, 'Etapa 1, 2 y 3'],
+  ];
+  const termsIn = (text, max = 1) => TERM_RX.filter(([rx]) => rx.test(text)).map(([, t]) => t).slice(0, max);
+  // tag: true antepone el término cuando la explicación no va justo debajo de él
+  const expl = (terms, tag = false) => terms.filter((t) => GLOSARIO[t]).map((t) => `<span class="exp">${tag ? `<b>${esc(t)}:</b> ` : ''}${esc(GLOSARIO[t].charAt(0).toUpperCase() + GLOSARIO[t].slice(1))}</span>`).join('');
+  const EXP_KEY = 'loreal-datalink-explicacion';
+  let explainOn = false;
+  try { explainOn = localStorage.getItem(EXP_KEY) === '1'; } catch (e) { /* sin almacenamiento */ }
+  function setExplain(on, announce) {
+    explainOn = on;
+    document.body.classList.toggle('explain-on', on);
+    $$('[data-explain]').forEach((b) => b.setAttribute('aria-pressed', String(on)));
+    try { localStorage.setItem(EXP_KEY, on ? '1' : '0'); } catch (e) { /* sin almacenamiento */ }
+    if (announce) toast(on ? 'Modo explicación activado · tecla E para ocultarlo' : 'Modo explicación desactivado');
+  }
+
   // ---------- usuarios (Tabla 21 y Tabla 23 de la propuesta) ----------
   const PERSONAS = [
     { id: 'finanzas', name: 'Laura Méndez', initials: 'LM', role: 'Directora de Finanzas', area: 'Dirección General y Finanzas', board: 1, boardName: 'Resumen ejecutivo',
@@ -1163,15 +1244,15 @@ if (typeof module !== 'undefined') module.exports = MODEL;
   function tile(o) {
     const delta = o.delta == null ? '' : `<span class="delta ${o.deltaGood == null ? '' : o.deltaGood ? 'up' : 'down'}">${signed(o.delta, 1)}${o.deltaUnit ?? '%'} <span>${esc(o.deltaLabel || 'vs periodo anterior')}</span></span>`;
     return `<article class="tile">
-      <header><h3>${esc(o.label)}</h3>${o.info ? `<span class="info" tabindex="0" data-tip="${esc(o.info)}">i</span>` : ''}</header>
+      <header><h3>${esc(o.label)}</h3>${o.info ? `<span class="info" tabindex="0" data-tip="${esc(o.info)}">i</span>` : ''}</header>${expl(o.terms || termsIn(o.label))}
       <div class="val">${o.value}</div>
       ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
       <footer>${o.sev ? chip(o.sev, o.sevText) : ''}${delta}${o.spark ? spark(o.spark, o.sparkCls || 's-so') : ''}</footer>
     </article>`;
   }
-  const card = (title, sub, body, o = {}) => `<section class="card ${o.cls || ''}"><header class="card-h"><div><h2>${esc(title)}</h2>${sub ? `<p>${sub}</p>` : ''}</div>${o.src ? `<span class="src" title="Fuente en Fabric: ${esc(o.src)}">${icon('db')}<span>${esc(o.src)}</span></span>` : ''}</header>${body}</section>`;
+  const card = (title, sub, body, o = {}) => `<section class="card ${o.cls || ''}"><header class="card-h"><div><h2>${esc(title)}</h2>${expl(o.terms || termsIn(title, 2))}${sub ? `<p>${sub}</p>` : ''}</div>${o.src ? `<span class="src" title="Fuente en Fabric: ${esc(o.src)}">${icon('db')}<span>${esc(o.src)}</span></span>` : ''}</header>${body}</section>`;
   const legend = (items) => `<div class="legend">${items.map(([cls, t, kind]) => `<span><i class="sw ${cls} ${kind || ''}"></i>${esc(t)}</span>`).join('')}</div>`;
-  const table = (cols, rows, o = {}) => `<div class="tbl-wrap"><table class="tbl ${o.cls || ''}"><thead><tr>${cols.map((c) => `<th class="${c.num ? 'num' : ''}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody>${o.foot ? `<tfoot>${o.foot}</tfoot>` : ''}</table></div>`;
+  const table = (cols, rows, o = {}) => `<div class="tbl-wrap"><table class="tbl ${o.cls || ''}"><thead><tr>${cols.map((c) => `<th class="${c.num ? 'num' : ''}">${esc(c.t)}${expl(termsIn(c.t))}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody>${o.foot ? `<tfoot>${o.foot}</tfoot>` : ''}</table></div>`;
   const empty = (t) => `<p class="empty">${esc(t)}</p>`;
   function freshness(chainIds, withSap = true) {
     const items = [];
@@ -1230,7 +1311,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       </div>
       <div class="grid-2">
         ${card('Sell-In vs Sell-Out por semana', `${esc(scopeLabel(ch, W))} · pesos a precio neto`, legend([['s-si', 'Sell-In (SAP)', 'line'], ['s-so', 'Sell-Out (integrador)', 'line']]) + '<div class="chart" id="c-exec"></div><p class="note">El Sell-In sube y baja con los pedidos de las cadenas; el Sell-Out es el consumo real y es más estable.</p>', { src: 'gold.fact_sell_in · gold.fact_sell_out' })}
-        ${card('Alertas más relevantes', `${al.length} activas con estos filtros · reglas de la Tabla 24`, al.length ? `<ol class="alerts">${al.slice(0, 5).map(alertItem).join('')}</ol>` : empty('Sin alertas con estos filtros.'), { src: 'Fabric Activator' })}
+        ${card('Alertas más relevantes', `${al.length} activas con estos filtros · reglas de la Tabla 24`, al.length ? `<ol class="alerts">${al.slice(0, 5).map(alertItem).join('')}</ol>` : empty('Sin alertas con estos filtros.'), { src: 'Fabric Activator', terms: ['Activator'] })}
       </div>
       ${card('Desempeño por cadena', `${esc(periodLabel(W))} · el semáforo usa las mismas reglas para todas las cadenas`, table(
         [{ t: 'Cadena' }, { t: 'Sell-In', num: 1 }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-through', num: 1 }, { t: 'Días de inv.', num: 1 }, { t: 'OOS', num: 1 }, { t: 'Estado' }],
@@ -1267,7 +1348,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
     }).join('');
     return card('Cobertura del data link sobre la venta de L’Oréal México', `Venta anual de referencia €1,000 M ≈ ${MXN(A.annualMXN)} · etapas de la Tabla 27 de la propuesta`,
       `<div class="cov-bar" role="img" aria-label="Etapa 1 cubre ${P(A.connected * 100, 1)} de la venta anual">${segs}</div><div class="cov-leg">${leg}</div><p class="note">Hoy los tableros ven ${P(A.connected * 100, 1)} de la venta. Las etapas 2 y 3 agregan fuentes sin rehacer el modelo: cada cadena nueva entra por las mismas capas Bronze, Silver y Gold.</p>`,
-      { src: 'Supuesto del equipo · mezcla por canal' });
+      { src: 'Supuesto del equipo · mezcla por canal', terms: ['Etapa 1, 2 y 3', 'Bronze / Silver / Gold'] });
   }
 
   // ---- 2 · KAM Walmart ----
@@ -1292,7 +1373,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
     const cell = (c) => {
       if (c.st == null) return '<td class="hm">—</td>';
       const t = Math.min(1, Math.abs(c.st - 100) / 40), pole = c.st < 100 ? 'var(--div-neg)' : 'var(--div-pos)';
-      return `<td class="hm" style="background:color-mix(in oklab, ${pole} ${Math.round(t * 78)}%, var(--div-mid));color:${t > 0.55 ? '#fff' : 'var(--ink)'}" data-tip="${esc(`${wlab(c.w[0])}–${wlab(c.w[3])} · Sell-In ${MXN(c.siV)} · Sell-Out ${MXN(c.soV)}`)}">${P(c.st, 0)}</td>`;
+      return `<td class="hm" style="background:color-mix(in oklab, ${pole} ${Math.round(t * 78)}%, var(--div-mid));color:${t > 0.55 ? 'var(--heat-ink)' : 'var(--ink)'}" data-tip="${esc(`${wlab(c.w[0])}–${wlab(c.w[3])} · Sell-In ${MXN(c.siV)} · Sell-Out ${MXN(c.soV)}`)}">${P(c.st, 0)}</td>`;
     };
     const hot = matrix.map((r) => ({ cat: r.cat, st: r.cells[2].st })).filter((r) => r.st != null).sort((x, y) => y.st - x.st)[0];
     const talk = [];
@@ -1304,22 +1385,22 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       .sort((m, n) => (m.kk.st ?? 999) - (n.kk.st ?? 999));
     const rest = D.PRODUCTS.filter((x) => !x.top && inFil(x));
     const kr = rest.length ? D.kpis(ch, rest.map((x) => x.id), W) : null;
-    const html = head(p, finding, `<div class="rls">${icon('lock')}<div><b>Ves solo Walmart de México.</b> Las otras 6 cadenas están ocultas por la regla de seguridad por fila (tabla usuario → cadena asignada en el modelo semántico).</div></div>` + freshness(ch)) + `
+    const html = head(p, finding, `<div class="rls">${icon('lock')}<div><b>Ves solo Walmart de México.</b> Las otras 6 cadenas están ocultas por la regla de seguridad por fila (tabla usuario → cadena asignada en el modelo semántico).${expl(['Seguridad por fila (RLS)', 'Modelo semántico'], true)}</div></div>` + freshness(ch)) + `
       <div class="tiles">
-        ${tile({ label: 'Sell-In a Walmart', value: MXN(k.siV), sub: `${K(k.si)} piezas · facturado a sus CEDIS`, delta: pk && pct(k.siV, pk.siV), spark: siV, sparkCls: 's-si', info: 'Facturación a los CEDIS de Walmart en SAP, a precio neto.' })}
+        ${tile({ label: 'Sell-In a Walmart', terms: ['Sell-In', 'CEDIS'], value: MXN(k.siV), sub: `${K(k.si)} piezas · facturado a sus CEDIS`, delta: pk && pct(k.siV, pk.siV), spark: siV, sparkCls: 's-si', info: 'Facturación a los CEDIS de Walmart en SAP, a precio neto.' })}
         ${tile({ label: 'Sell-Out en Walmart', value: MXN(k.soV), sub: `${K(k.so)} piezas · ${N(D.chainById.walmart.stores)} tiendas`, delta: pk && pct(k.soV, pk.soV), deltaGood: pk ? k.soV >= pk.soV : null, spark: soV })}
         ${tile({ label: 'Sell-through', value: P(k.st), sub: 'Sell-Out ÷ Sell-In, en piezas', sev: stStatus(k.st), delta: pk && k.st - pk.st, deltaUnit: ' pts', deltaGood: pk ? k.st >= pk.st : null, info: 'Sell-Out ÷ Sell-In. Meta: 95% o más.' })}
         ${tile({ label: 'Días de inventario', value: F(k.doi, 0) + ' <small>días</small>', sub: `OOS en tiendas: ${P(oos)}`, sev: doiStatus(k.doi), info: 'Inventario reportado por Walmart ÷ Sell-Out diario promedio de los últimos 28 días.' })}
       </div>
-      ${card('Lo que compró vs lo que vendió, por semana', `Walmart de México · ${esc([prodLabel(), periodLabel(W)].filter(Boolean).join(' · '))} · pesos a precio neto`, legend([['s-si', 'Sell-In (pedidos a SAP)'], ['s-so', 'Sell-Out (venta al consumidor)']]) + '<div class="chart" id="c-kam"></div><p class="note">Walmart pide cada dos semanas; por eso el Sell-In aparece una semana sí y otra no.</p>', { src: 'gold.fact_sell_in · gold.fact_sell_out · RLS' })}
+      ${card('Lo que compró vs lo que vendió, por semana', `Walmart de México · ${esc([prodLabel(), periodLabel(W)].filter(Boolean).join(' · '))} · pesos a precio neto`, legend([['s-si', 'Sell-In (pedidos a SAP)'], ['s-so', 'Sell-Out (venta al consumidor)']]) + '<div class="chart" id="c-kam"></div><p class="note">Walmart pide cada dos semanas; por eso el Sell-In aparece una semana sí y otra no.</p>', { src: 'gold.fact_sell_in · gold.fact_sell_out · RLS', terms: ['Sell-In', 'Sell-Out'] })}
       <div class="grid-2">
         ${card('Sell-through por categoría', 'Bloques de 4 semanas · menos de 100% significa que Walmart acumuló inventario', table([{ t: 'Categoría' }, ...blocks.map(([a0, b0]) => ({ t: `${wlab(a0)}–${wlab(b0)}`, num: 1 }))], matrix.map((r) => `<tr><td>${esc(r.cat)}</td>${r.cells.map(cell).join('')}</tr>`), { cls: 'heat' }) + `<div class="div-legend"><span>Acumula inventario</span><i></i><span>Vende más de lo que compra</span></div>`, { src: 'gold.fact_* · dim_producto' })}
-        ${card('Para la reunión con el comprador', 'Puntos que salen de los datos de esta pantalla', `<ol class="talk">${talk.slice(0, 3).map((t) => `<li>${chip(t.sev, t.tag)}<p>${esc(t.text)}</p></li>`).join('')}</ol>`)}
+        ${card('Para la reunión con el comprador', 'Puntos que salen de los datos de esta pantalla', `<ol class="talk">${talk.slice(0, 3).map((t) => `<li>${chip(t.sev, t.tag)}<p>${esc(t.text)}</p></li>`).join('')}</ol>`, { terms: ['KAM'] })}
       </div>
       ${card('Productos prioritarios en Walmart', `${esc(periodLabel(W))} · del sell-through más bajo al más alto · cada código de Walmart ya está ligado al material SAP`, tops.length ? table(
         [{ t: 'Producto' }, { t: 'Código Walmart' }, { t: 'Material SAP' }, { t: 'Sell-In', num: 1 }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-through', num: 1 }, { t: 'Días de inv.', num: 1 }],
         tops.map(({ x, kk, cs }) => `<tr class="${cs.cls !== 'Normal' ? 'hl' : ''}"><td><b>${esc(x.brand)}</b> ${esc(x.name)}</td><td class="mono">${x.codes.walmart}</td><td class="mono">${x.sap}</td><td class="num">${MXN(kk.siV)}</td><td class="num">${MXN(kk.soV)}</td><td class="num">${P(kk.st, 0)}</td><td class="num">${cs.cls !== 'Normal' ? chip('critical', F(cs.doi, 0) + ' · ' + cs.cls) : F(cs.doi, 0)}</td></tr>`),
-        { foot: kr ? `<tr><td colspan="3">Resto del portafolio · ≈ ${N(D.sum(rest.map((x) => x.skus)))} SKUs agregados por marca y categoría</td><td class="num">${MXN(kr.siV)}</td><td class="num">${MXN(kr.soV)}</td><td class="num">${P(kr.st, 0)}</td><td class="num">${F(kr.doi, 0)}</td></tr>` : '' }) : empty('Sin productos con estos filtros.'), { src: 'silver.map_producto_cadena · dim_producto' })}`;
+        { foot: kr ? `<tr><td colspan="3">Resto del portafolio · ≈ ${N(D.sum(rest.map((x) => x.skus)))} SKUs agregados por marca y categoría</td><td class="num">${MXN(kr.siV)}</td><td class="num">${MXN(kr.soV)}</td><td class="num">${P(kr.st, 0)}</td><td class="num">${F(kr.doi, 0)}</td></tr>` : '' }) : empty('Sin productos con estos filtros.'), { src: 'silver.map_producto_cadena · dim_producto', terms: ['Homologación'] })}`;
     const after = () => barChart($('#c-kam'), {
       aria: 'Sell-In y Sell-Out semanales de Walmart en pesos', labels: W.map(wlab), money: true,
       series: [{ cls: 's-si', values: siV }, { cls: 's-so', values: soV }],
@@ -1350,10 +1431,10 @@ if (typeof module !== 'undefined') module.exports = MODEL;
         ${tile({ label: 'Casos en exceso', value: String(ex.length), sub: ex.length ? `${MXN(exV)} de inventario detenido` : 'Más de 45 días de inventario', sev: ex.length ? 'critical' : 'good', sevText: ex.length ? 'Ajustar pedidos' : 'Sin casos' })}
         ${tile({ label: 'Casos en riesgo de quiebre', value: String(rk.length), sub: 'Menos de 7 días de inventario', sev: rk.length ? 'critical' : 'good', sevText: rk.length ? 'Acelerar surtido' : 'Sin casos' })}
       </div>
-      ${card('Cobertura vs sell-through por cadena y producto', `Cada punto es una combinación cadena-producto prioritario (${cases.length}) · sell-through de las últimas 8 semanas`, cases.length ? legend([['pt-Normal', 'Normal', 'dot'], ['pt-Exceso', 'Exceso', 'dot'], ['pt-Riesgo', 'Riesgo de quiebre', 'dot']]) + '<div class="chart" id="c-scatter"></div>' : empty('Sin productos con estos filtros.'), { src: 'gold.fact_inventario · gold.fact_sell_out' })}
+      ${card('Cobertura vs sell-through por cadena y producto', `Cada punto es una combinación cadena-producto prioritario (${cases.length}) · sell-through de las últimas 8 semanas`, cases.length ? legend([['pt-Normal', 'Normal', 'dot'], ['pt-Exceso', 'Exceso', 'dot'], ['pt-Riesgo', 'Riesgo de quiebre', 'dot']]) + '<div class="chart" id="c-scatter"></div>' : empty('Sin productos con estos filtros.'), { src: 'gold.fact_inventario · gold.fact_sell_out', terms: ['Días de inventario', 'Sell-through'] })}
       ${card('Casos fuera de rango', 'Para la revisión del S&OP mensual', out.length ? table(
           [{ t: 'Cadena' }, { t: 'Producto' }, { t: 'Días inv.', num: 1 }, { t: 'Inventario', num: 1 }, { t: 'Sell-through 8 sem', num: 1 }, { t: 'Qué hacer' }],
-          out.map((c) => `<tr><td>${esc(c.chain.short)}</td><td><b>${esc(c.prod.brand)}</b> ${esc(c.prod.name)}</td><td class="num">${chip('critical', F(c.doi, 0) + ' · ' + c.cls)}</td><td class="num">${MXN(invV(c))}</td><td class="num">${P(c.st8, 0)}</td><td>${c.cls === 'Exceso' ? 'Reducir o pausar pedidos' : 'Acelerar surtido'}</td></tr>`)) : empty('Ningún caso fuera de rango con estos filtros.'), { src: 'gold.fact_inventario' })}
+          out.map((c) => `<tr><td>${esc(c.chain.short)}</td><td><b>${esc(c.prod.brand)}</b> ${esc(c.prod.name)}</td><td class="num">${chip('critical', F(c.doi, 0) + ' · ' + c.cls)}</td><td class="num">${MXN(invV(c))}</td><td class="num">${P(c.st8, 0)}</td><td>${c.cls === 'Exceso' ? 'Reducir o pausar pedidos' : 'Acelerar surtido'}</td></tr>`)) : empty('Ningún caso fuera de rango con estos filtros.'), { src: 'gold.fact_inventario', terms: ['S&OP'] })}
       ${card('Conciliación de inventario', `Inventario implícito (inicial + Sell-In − Sell-Out) frente al que reporta la cadena · ${esc(periodLabel(W))}`, table(
           [{ t: 'Cadena' }, { t: 'Implícito (pzas)', num: 1 }, { t: 'Reportado (pzas)', num: 1 }, { t: 'Diferencia', num: 1 }, { t: 'Estado' }],
           rc.map((r) => `<tr class="${r.flag ? 'hl' : ''}"><td>${esc(r.chain.short)}</td><td class="num">${K(r.implicit)}</td><td class="num">${K(r.reported)}</td><td class="num">${signed(r.diff, 1)}%</td><td>${r.flag ? chip('warning', 'Revisar') : chip('good', 'Cuadra')}</td></tr>`)) +
@@ -1411,7 +1492,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       </div>
       <div class="grid-2 wide-l">
         ${card('Quiebres por ciudad', `${N(stores.length)} tiendas en ${cities.length} ciudades · tamaño por número de tiendas · color frente al promedio (${P(base * 100, 0)})`, legend([['cst-good', 'Hasta 1.3× el promedio', 'dot'], ['cst-warning', '1.3× a 1.8×', 'dot'], ['cst-critical', 'Más de 1.8×', 'dot']]) + '<div class="chart map" id="c-map"></div>', { src: 'gold.fact_inventario · dim_tienda' })}
-        ${card('Dónde empezar el reabasto', `Venta perdida en los quiebres activos de hoy (${MXN(activeLost)}), por producto`, items.length ? '<div class="chart" id="c-pareto"></div><p class="note">Pocos productos explican la mayor parte de la pérdida: el reabasto empieza por arriba de la lista.</p>' : empty('Sin quiebres activos con estos filtros.'), { src: 'gold.fact_inventario · dim_producto' })}
+        ${card('Dónde empezar el reabasto', `Venta perdida en los quiebres activos de hoy (${MXN(activeLost)}), por producto`, items.length ? '<div class="chart" id="c-pareto"></div><p class="note">Pocos productos explican la mayor parte de la pérdida: el reabasto empieza por arriba de la lista.</p>' : empty('Sin quiebres activos con estos filtros.'), { src: 'gold.fact_inventario · dim_producto', terms: ['Venta perdida'] })}
       </div>
       ${card('Quiebres activos', 'Los 10 más largos · días consecutivos en cero hasta hoy', rowsT.length ? table(
         [{ t: 'Tienda' }, { t: 'Cadena' }, { t: 'Ciudad' }, { t: 'Producto' }, { t: 'Días', num: 1 }, { t: 'Venta perdida', num: 1 }],
@@ -1438,13 +1519,13 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       <div class="tiles">
         ${tile({ label: 'Cambio en Sell-Out', value: signed(e.liftSO, 0) + '%', sub: 'Campaña vs base de igual duración', info: 'Sell-Out de las semanas de campaña ÷ (promedio semanal de las 4 semanas previas × duración) − 1.' })}
         ${tile({ label: 'Cambio en Sell-In', value: signed(e.liftSI, 0) + '%', sub: 'Lo que la cadena compró', info: 'Mismo cálculo con el Sell-In facturado en SAP.' })}
-        ${tile({ label: 'Venta incremental', value: MXN(e.incrV), sub: `${K(e.incr)} piezas sobre la base · precio neto`, info: 'Sell-Out de la campaña menos la base, valuado a precio neto.' })}
+        ${tile({ label: 'Venta incremental', terms: ['Precio neto'], value: MXN(e.incrV), sub: `${K(e.incr)} piezas sobre la base · precio neto`, info: 'Sell-Out de la campaña menos la base, valuado a precio neto.' })}
         ${tile({ label: 'Después de la campaña', value: signed(e.postLift, 0) + '%', sub: e.stPost == null ? `Sell-Out 2 semanas después · ${esc(e.chain.short)} no hizo pedidos` : `Sell-Out 2 semanas después · sell-through ${P(e.stPost, 0)}`, info: 'Si el Sell-Out se mantiene arriba de la base, el aumento fue de consumo real y no solo de inventario.' })}
       </div>
       ${card('Sell-Out y Sell-In alrededor de la campaña', `${esc(e.chain.name)} · piezas por semana${e.pr.cats ? ' · ' + e.pr.cats.join(', ') : ''}`, legend([['s-si', 'Sell-In', 'line'], ['s-so', 'Sell-Out', 'line'], ['b-camp', 'Campaña', 'box'], ['b-base', 'Base (4 semanas previas)', 'box']]) + '<div class="chart" id="c-promo"></div>', { src: 'gold.fact_sell_in · gold.fact_sell_out' })}
       ${card(`Las ${evals.length} campañas con la misma regla`, 'Elevó el consumo: Sell-Out +15% y se sostiene · Solo llenó el canal: Sell-In +50% sin que suba el Sell-Out', table(
         [{ t: 'Campaña' }, { t: 'Cadena' }, { t: 'Semanas' }, { t: 'Sell-Out', num: 1 }, { t: 'Sell-In', num: 1 }, { t: 'Después', num: 1 }, { t: 'Venta incremental', num: 1 }, { t: 'Veredicto' }],
-        evals.map((x) => `<tr class="${x.pr.id === promoSel ? 'hl' : ''}"><td><b>${esc(x.pr.name)}</b></td><td>${esc(x.chain.short)}</td><td>${x.label}</td><td class="num">${signed(x.liftSO, 0)}%</td><td class="num">${signed(x.liftSI, 0)}%</td><td class="num">${signed(x.postLift, 0)}%</td><td class="num">${MXN(x.incrV)}</td><td>${vChip(x.verdict)}</td></tr>`)), { src: 'gold.fact_* · calendario de campañas' })}`;
+        evals.map((x) => `<tr class="${x.pr.id === promoSel ? 'hl' : ''}"><td><b>${esc(x.pr.name)}</b></td><td>${esc(x.chain.short)}</td><td>${x.label}</td><td class="num">${signed(x.liftSO, 0)}%</td><td class="num">${signed(x.liftSI, 0)}%</td><td class="num">${signed(x.postLift, 0)}%</td><td class="num">${MXN(x.incrV)}</td><td>${vChip(x.verdict)}</td></tr>`)), { src: 'gold.fact_* · calendario de campañas', terms: ['Llenado del canal'] })}`;
     const after = () => {
       const w = e.win;
       lineChart($('#c-promo'), {
@@ -1470,7 +1551,8 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       : 'Todas las cadenas entregaron a tiempo.';
     const pending = D.QUAR.filter((q) => q.status === 'pendiente');
     const html = head(p, finding, `<div class="rls soft">${icon('lock')}<div>Perfil técnico: ve las cargas, la calidad y la cuarentena. <b>No tiene acceso a los tableros comerciales</b> (roles del espacio de trabajo en Fabric).</div></div>`) + `
-      <div class="pipe" aria-label="Estado del pipeline de hoy">${D.PIPELINE.map((s, i) => `${i ? `<span class="pipe-arrow">${icon('arrow')}</span>` : ''}<div class="stage st-${s.sev}"><div class="stage-top">${s.sev === 'good' ? icon('check') : icon('alert')}<b>${esc(s.name)}</b></div><span>${esc(s.sub)}</span><span class="stage-n">${esc(s.note)} · ${s.time}</span></div>`).join('')}</div>
+      <div class="pipe-exp">${expl(['Pipeline', 'Bronze / Silver / Gold'], true)}</div>
+      <div class="pipe" aria-label="Estado del pipeline de hoy">${D.PIPELINE.map((s, i) => `${i ? `<span class="pipe-arrow">${icon('arrow')}</span>` : ''}<div class="stage st-${s.sev}"><div class="stage-top">${s.sev === 'good' ? icon('check') : icon('alert')}<b>${esc(s.name)}</b></div>${s.name === 'Modelo semántico' ? expl(['Modelo semántico', 'Direct Lake']) : ''}<span>${esc(s.sub)}</span><span class="stage-n">${esc(s.note)} · ${s.time}</span></div>`).join('')}</div>
       <div class="tiles">
         ${tile({ label: 'Cadenas al día', value: `${onTime} <small>de ${H.length}</small>`, sub: 'Entregaron en el plazo esperado', sev: onTime === H.length ? 'good' : 'critical', sevText: onTime === H.length ? 'Todas a tiempo' : `${H.length - onTime} con retraso` })}
         ${tile({ label: 'Sell-Out homologado', value: P(homW), sub: 'Ponderado por la venta de cada cadena', sev: homW >= 99 ? 'good' : 'warning' })}
@@ -1485,7 +1567,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
           const txt = late ? 'Sin entrega' : volBad ? 'Lote incompleto' : h.quarantine ? 'Cuarentena' : 'Al día';
           return `<tr class="${sev === 'critical' ? 'hl' : ''}"><td><b>${esc(h.chain.name)}</b></td><td>${h.chain.freq}</td><td>${h.chain.lastCutLabel}</td><td class="num">${h.chain.delayDays > 0 ? h.chain.delayDays + ' días' : '—'}</td><td class="num">${h.rows == null ? 'sin lote' : N(h.rows)}</td><td class="num">${h.vol == null ? '—' : signed(h.vol, 0) + '%'}</td><td class="num">${P(h.homologated, 1)}</td><td class="num">${h.quarantine ? `${h.quarantine} · ${h.oldest} ${h.oldest === 1 ? 'día' : 'días'}` : '0'}</td><td>${chip(sev, txt)}</td></tr>`;
         })), { src: 'Bitácora de cargas · Data Factory' })}
-      ${card('Cola de homologación', `${pending.length} pendientes en pantalla de ${totalQ} registros en cuarentena · los más antiguos primero · aprueba uno para ver cómo cambian las cifras`, `<ul class="queue" id="queue">${D.QUAR.map(qItem).join('')}</ul><p class="note">Al aprobar, el código de la cadena queda ligado al GTIN y al material SAP en silver.map_producto_cadena, y el registro pasa a Silver y Gold.</p>`, { src: 'silver.cuarentena · ai.similarity' })}
+      ${card('Cola de homologación', `${pending.length} pendientes en pantalla de ${totalQ} registros en cuarentena · los más antiguos primero · aprueba uno para ver cómo cambian las cifras`, `<ul class="queue" id="queue">${D.QUAR.map(qItem).join('')}</ul><p class="note">Al aprobar, el código de la cadena queda ligado al GTIN y al material SAP en silver.map_producto_cadena, y el registro pasa a Silver y Gold.</p>`, { src: 'silver.cuarentena · ai.similarity', terms: ['Homologación', 'GTIN'] })}
       ${card('Reglas de calidad', 'Última carga · se ejecutan en la capa Silver', table(
         [{ t: 'Regla' }, { t: 'Qué revisa' }, { t: 'Registros', num: 1 }, { t: 'Resultado' }],
         D.RULES_DQ.map((r) => `<tr><td><b class="mono">${r.id}</b> ${esc(r.name)}</td><td>${esc(r.check)}</td><td class="num">${r.id === 'C06' ? '—' : N(r.n)}</td><td>${chip(r.sev, r.action)}</td></tr>`)), { src: 'Notebook de calidad · Silver' })}`;
@@ -1523,7 +1605,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
       ['Venta anual de referencia', `€${N(A.annualEUR / 1e6)} M`, `≈ ${MXN(A.annualMXN)} MXN`],
       ['Conectado en la Etapa 1', P(A.connected * 100, 1), `7 cadenas · ≈ ${MXN(A.connected * A.annualMXN)} al año`],
       ['Datos al', D.fmtDateY(D.CUT), 'Modelo actualizado a las 04:20'],
-    ].map(([k, v, s]) => `<div><dt>${k}</dt><dd>${v}<span>${s}</span></dd></div>`).join('');
+    ].map(([k, v, s]) => `<div><dt>${k}</dt><dd>${v}<span>${s}</span></dd>${expl(termsIn(k))}</div>`).join('');
     const top = D.TOP, restSkus = D.sum(D.PRODUCTS.filter((x) => !x.top).map((x) => x.skus));
     $('#assume').innerHTML = [
       `Venta anual de L’Oréal México de €1,000 M (dato que compartió el profesor), convertida a 20 pesos por euro: ≈ ${MXN(A.annualMXN)}. Como referencia, el euro cerró en 19.83 pesos el 6 de agosto de 2026.`,
@@ -1540,18 +1622,19 @@ if (typeof module !== 'undefined') module.exports = MODEL;
   }
   function renderSession(p) {
     const al = alertsFor(p.id);
-    $('#session').innerHTML = `<div class="who"><span class="av big">${p.initials}</span><div><p class="who-l">Sesión iniciada</p><p class="who-n">${esc(p.name)}</p><p class="who-r">${esc(p.role)} · ${esc(p.area)}</p></div></div>
+    $('#session').innerHTML = `<div class="who"><span class="av big">${p.initials}</span><div><p class="who-l">Sesión iniciada</p><p class="who-n">${esc(p.name)}</p><p class="who-r">${esc(p.role)} · ${esc(p.area)}</p>${expl(termsIn(p.role), true)}</div></div>
       <dl class="facts">
         <div><dt>Tablero</dt><dd>${p.board} · ${esc(p.boardName)}</dd></div>
         <div><dt>Qué ve</dt><dd>${esc(p.scope)}</dd></div>
-        <div><dt>Permisos</dt><dd class="${p.locked ? 'lock' : ''}">${p.locked ? icon('lock') : ''}${esc(p.rls)}</dd></div>
+        <div><dt>Permisos</dt><dd class="${p.locked ? 'lock' : ''}">${p.locked ? icon('lock') : ''}${esc(p.rls)}</dd>${expl(termsIn(p.rls), true)}</div>
         <div><dt>Alertas para ti</dt><dd>${al.length ? `${icon('bell')}${al.length > 2 ? al.length + ' activas hoy' : al.length + ' · ' + esc(al.map((a) => a.rule.name).filter((v, i, s) => s.indexOf(v) === i).join(', '))}` : 'Ninguna hoy'}</dd></div>
       </dl>`;
   }
+  const explainBtn = () => `<button type="button" class="btn ghost sm exp-btn" data-explain aria-pressed="${explainOn}" title="Muestra u oculta la explicación de cada término (tecla E)">Modo explicación <kbd>E</kbd></button>`;
   function renderFilters(pid) {
     const el = $('#filters');
     if (pid === 'trade' || pid === 'ti') {
-      el.innerHTML = `<p class="fl-note">${icon('filter')}${pid === 'trade' ? 'Cada campaña trae su propia cadena y semanas: en este tablero no aplican los filtros globales.' : 'Salud del dato revisa las cargas completas de las 7 cadenas: aquí no aplican los filtros comerciales.'}</p>`;
+      el.innerHTML = `<p class="fl-note">${icon('filter')}${pid === 'trade' ? 'Cada campaña trae su propia cadena y semanas: en este tablero no aplican los filtros globales.' : 'Salud del dato revisa las cargas completas de las 7 cadenas: aquí no aplican los filtros comerciales.'}</p>${explainBtn()}`;
       return;
     }
     const opt = (v, t, cur) => `<option value="${esc(v)}"${String(v) === String(cur) ? ' selected' : ''}>${esc(t)}</option>`;
@@ -1567,7 +1650,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
     const div = sel('f-div', 'División', opt('all', 'Todas', FIL.div) + Object.entries(D.DIVS).map(([k, v]) => opt(k, v, FIL.div)).join(''));
     const cat = sel('f-cat', 'Categoría', opt('all', 'Todas', FIL.cat) + catsForDiv(FIL.div).map((c) => opt(c, c, FIL.cat)).join(''));
     const dirty = FIL.period !== FIL0.period || FIL.div !== FIL0.div || FIL.cat !== FIL0.cat || FIL.chain !== FIL0.chain;
-    el.innerHTML = `<span class="fl-h">${icon('filter')}Filtros</span>${period}${chain}${div}${cat}${dirty ? '<button type="button" class="btn ghost sm" id="f-reset">Limpiar filtros</button>' : ''}<span class="fl-note">Se conservan al cambiar de usuario</span>`;
+    el.innerHTML = `<span class="fl-h">${icon('filter')}Filtros</span>${period}${chain}${div}${cat}${dirty ? '<button type="button" class="btn ghost sm" id="f-reset">Limpiar filtros</button>' : ''}<span class="fl-note">Se conservan al cambiar de usuario</span>${explainBtn()}`;
   }
   function render(pid, animate = true) {
     current = pid;
@@ -1607,6 +1690,7 @@ if (typeof module !== 'undefined') module.exports = MODEL;
     const pr = ev.target.closest('[data-promo]'); if (pr) { promoSel = pr.dataset.promo; render('trade', false); return; }
     const ap = ev.target.closest('[data-approve]'); if (ap) { resolveQ(ap.dataset.approve, 'aprobado'); return; }
     const rj = ev.target.closest('[data-reject]'); if (rj) { resolveQ(rj.dataset.reject, 'rechazado'); return; }
+    if (ev.target.closest('[data-explain]')) { setExplain(!explainOn, true); return; }
     if (ev.target.closest('#f-reset')) { Object.assign(FIL, FIL0); render(current, false); toast('Filtros restablecidos: últimas 13 semanas, todo el portafolio'); return; }
     if (ev.target.closest('[data-assume]')) { const d = $('#supuestos'); d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   });
@@ -1615,11 +1699,13 @@ if (typeof module !== 'undefined') module.exports = MODEL;
   document.addEventListener('focusin', (ev) => { const t = ev.target.closest('[data-tip]'); if (t) { const r = t.getBoundingClientRect(); showTip({ clientX: r.right, clientY: r.bottom }, `<div class="tt-p">${esc(t.dataset.tip)}</div>`); } });
   document.addEventListener('focusout', (ev) => { if (ev.target.closest('[data-tip]')) hideTip(); });
   document.addEventListener('keydown', (ev) => {
-    if (ev.target.closest('input, textarea, select') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    if (ev.target.closest('input, textarea, select, [contenteditable]') || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    if ((ev.key === 'e' || ev.key === 'E') && !ev.repeat) { setExplain(!explainOn, true); return; }
     const n = Number(ev.key); if (n >= 1 && n <= 6) go(PERSONAS[n - 1].id, true);
   });
   window.addEventListener('scroll', hideTip, { passive: true });
 
+  setExplain(explainOn, false);
   renderHero();
   const start = (location.hash || '').replace('#', '');
   render(SCREENS[start] ? start : 'finanzas', false);
